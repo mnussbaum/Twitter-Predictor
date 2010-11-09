@@ -53,7 +53,7 @@ class Population(object):
         return self._community
 
     def _filled_user_score(self, user):
-        '''The score for a user for where user is a TwitterUser object.'''
+        '''The score for a user for where user is the result of a TwitterUser object.'''
         if self._community:
             pop_stats = PopulationStats(self._community)
             community_members = pop_stats.all_users()
@@ -85,14 +85,14 @@ class Population(object):
             score = 0
         return score
 
-    def _empty_user_score(self, user):
-        '''The score for a user where user is just a screen name.'''
+    def _empty_user_score(self, user_name):
+        '''The score for a user_name.'''
         if self._community:
             stats = PopulationStats(self._community)
             community_friends = stats.all_relation('friends')
-            friended = community_friends.count(user)
+            friended = community_friends.count(user_name)
             community_follows = stats.all_relation('followers')
-            followed = community_follows.count(user)
+            followed = community_follows.count(user_name)
             #just total or should we weight? Probably should normalize
             #for current population size somehow
             score = friended + followed
