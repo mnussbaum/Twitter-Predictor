@@ -2,8 +2,9 @@ from word_counts import WordCounter
 
 #TODO get retweets -- it looks like you need to be friends with a user to get their retweets
 
-class Stats(object):
-    
+class PopulationStats(object):
+    '''Metrics on a population.'''
+
     def __init__(self, population):
         self._population = population
 
@@ -33,9 +34,9 @@ class Stats(object):
                     else:
                         assigned_duplicates[user['screen_name']] = [duplicate]
         return len(duplicates), assigned_duplicates
-    
+
     def word_data(self):
-        '''Word counts and neighbors for all tweets combined into one.'''
+        '''Word counts and neighbors for all tweets.'''
         all_text = ""
         for user in self._population:
             tweets = user['tweets']
@@ -44,14 +45,14 @@ class Stats(object):
         counter = WordCounter(all_text)
         word_data = counter.get_word_data()
         return word_data
-    
+        
     def all_users(self):
         '''All user screen names.'''
         user_names = []
         for user in self._population:
             user_names.append(user['screen_name'])
         return user_names
-    
+
     def all_relation(self, list_name):
         '''Get all followers/friends names.'''
         if list_name not in self._population[0]:
@@ -61,44 +62,63 @@ class Stats(object):
             relations = user[list_name]
             relation_names.extend(relations)
         return relation_names
-    
-    def user_word_data(self, user_name, by_tweet=True):
-        '''Word counts and neighbors for each of a user's tweets or all of a user's tweets.'''
+
+class UserStats(object):
+    '''Metrics on a user in a population.'''
+
+    def __init__(self, user, population):
+        self._user = user
+        self._user_name = user['screen_name']
+        self._population = population
+        self._pop_stats = PopulationStats(self._population)
+
+    def word_data(self):
+        '''Returns word counts and neighbors for all of a user's tweets.'''
         for user in self._population:
-            if user['screen_name'] == user_name:
+            if user['screen_name'] == self._user_name:
                 found = True
                 break
             else:
                 found = False
         if not found:
-            raise Exception('User not in population: %s' % user_name)
-        #either gets users word data by tweet or in entirety
-        if by_tweet:
-            tweet_data = []
-            for tweet in user['tweets']:
-                text = tweet['text']
-                counter = WordCounter(text)
-                word_data = counter.get_word_data()
-                tweet_data.append({'id':tweet['id'], 'text':text, 'word_data':word_data})
-            return tweet_data
-        elif not by_tweet:
-            all_text = ""
-            for tweet in user['tweets']:
-                all_text += ' ' + tweet['text']
-            counter = WordCounter(all_text)
+            raise Exception('User not in population: %s' % self._user_name)
+        all_text = ""
+        for tweet in user['tweets']:
+            all_text += ' ' + tweet['text']
+        counter = WordCounter(all_text)
+        word_data = counter.get_word_data()
+        return word_data
+
+    def word_data(self):
+        '''Word counts and neighbors for each of a user's tweets.'''
+        for user in self._population:
+            if user['screen_name'] == self._user_name:
+                found = True
+                break
+            else:
+                found = False
+        if not found:
+            raise Exception('User not in population: %s' % self._user_name)
+        tweet_data = []
+        for tweet in user['tweets']:
+            text = tweet['text']
+            counter = WordCounter(text)
             word_data = counter.get_word_data()
-            return word_data
-    
-    def user_hash_tags(self, user_name):
-        word_data = self.user_word_data(user_name, by_tweet=False)
+            tweet_data.append({'id':tweet['id'], 'text':text, 'word_data':word_data})
+        return tweet_data
+
+    def hash_tags(self):
+        '''Word data for all the hash tags in a user's tweets.'''
+        word_data = self._pop_stats.word_data()
         found_hashes = []
         for word in word_data:
             if word[0] == "#":
                 found_hashes.append(word_data[word])
         return found_hashes
-        
-    def user_replies(self, user_name):
-        word_data = self.user_word_data(user_name, by_tweet=False)
+
+    def replies(self):
+        '''Word data for all the replies in a user's tweets.'''
+        word_data = self._pop_stats.word_data()
         found_replies = []
         for word in word_data:
             if word[0] == "@":

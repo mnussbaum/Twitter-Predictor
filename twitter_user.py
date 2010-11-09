@@ -5,7 +5,7 @@ from twitter.oauth import OAuth
 
 class TwitterUser(object):
     '''Pulls information about a twitter screen name.'''
-    
+
     def __init__(self, user_screen_name):
         #Twitter OAuth tokens and secrets, necessary for logging in to get higher rate-limit
         con_secret = '3fxVf35NsyWhepbAYnDijr5uVK1jnTEIQwuSOaFbqA'
@@ -45,8 +45,7 @@ class TwitterUser(object):
                     new_tweet[field] = tweet[field]
             trimmed_tweets.append(new_tweet)
         return trimmed_tweets
-        
-        
+
     def get_all_data(self):
         '''Runs all data gathering methods, returns results.'''
         followers = self._get_followers()

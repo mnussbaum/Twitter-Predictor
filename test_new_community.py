@@ -6,8 +6,8 @@ pp = PrettyPrinter(indent=4)
 from utils import get_community, write_output
 
 def main():
-    community = get_community('nuss08', write=True)
+    community = get_community('nuss08', write=True, write_dir="pickled_populations/")
     pp.pprint(community)
-            
+
 if __name__=="__main__":
    main()

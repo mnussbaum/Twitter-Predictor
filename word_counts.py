@@ -2,7 +2,8 @@ import string
 import re
 
 class WordCounter(object):
-    
+    '''Counts the occurrences of every word in text, 
+    also keeps track of word neighbors.'''
     def __init__(self, text):
         self._word_data = {}
         index = 0
@@ -33,11 +34,11 @@ class WordCounter(object):
             word_data['neighbors'].append({'previous_neighbor':formated_previous, 'next_neighbor':formated_next})
             word_data['count'] += 1
             index += 1    
-    
+
     def _format_text(self, text):
         regex = re.compile('[%s]' % re.escape(';:,'))
         unpunctuated_text = regex.sub('', text)
         return unpunctuated_text.lower()
-    
+
     def get_word_data(self):
         return self._word_data
