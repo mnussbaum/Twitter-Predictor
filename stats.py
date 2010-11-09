@@ -104,7 +104,8 @@ class UserStats(object):
             text = tweet['text']
             counter = WordCounter(text)
             word_data = counter.get_word_data()
-            tweet_data.append({'id':tweet['id'], 'text':text, 'word_data':word_data})
+            tweet_data.append({'id':tweet['id'], 'text':text, \
+              'word_data':word_data})
         return tweet_data
 
     def hash_tags(self):

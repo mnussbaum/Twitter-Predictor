@@ -8,7 +8,7 @@ from stats import PopulationStats
 from utils import write_output, get_community, read_output
 
 def main():
-    community = read_output('pickled_populations/pickled_2010-11-06')
+    community = read_output('pickled_populations/test2')
     s = PopulationStats(community)
     community_members = s.all_users()
     print 'Community Members:'

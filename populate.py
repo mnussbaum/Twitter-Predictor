@@ -11,10 +11,10 @@ from stats import PopulationStats, UserStats
 class Population(object):
     '''Gathers a population of interconnected twitter users.'''
 
-    def __init__(self, root_user_name, max_population=100, max_followers_per_user=10):
+    def __init__(self, root_user_name, max_population=24, max_friends_per_user=5):
         self._root_user_name = root_user_name
         self._max_population = max_population
-        self._max_followers_per_user = max_followers_per_user
+        self._max_friends_per_user = max_friends_per_user
         self._community = []
 
     def populate(self):
@@ -22,6 +22,7 @@ class Population(object):
         interconnected group.''' 
         root_user = TwitterUser(self._root_user_name)
         root_node = root_user.get_all_data()
+        self._community.append(root_node)
         root_score = self._filled_user_score(root_node)
         #user scores determine how interconnected a user is
         nodes = {root_score:root_node}
@@ -32,11 +33,12 @@ class Population(object):
             curr_node = nodes[highest_score]
             #once a user is chosen for evaluation pop him off the node list
             del nodes[highest_score]
-            #choose followers by rank to add to community
-            followers = self._sort_by_empty_score(curr_node['followers'])
-            for follower in followers[:self._max_followers_per_user]:
+            #choose friends by rank to add to community, seems to work
+            #better then followers
+            friends = self._sort_by_empty_score(curr_node['friends'])
+            for friend in friends[:self._max_friends_per_user]:
                 try:
-                    tu = TwitterUser(follower)
+                    tu = TwitterUser(friend)
                     sleep(1)
                     new_user = tu.get_all_data()
                     self._community.append(new_user)
@@ -56,8 +58,10 @@ class Population(object):
             pop_stats = PopulationStats(self._community)
             community_members = pop_stats.all_users()
             #num of user's followers/friends in the community
-            friend_overlap = len(self._intersection(user['friends'], community_members))
-            follower_overlap = len(self._intersection(user['followers'], community_members))
+            friend_overlap = len(self._intersection(user['friends'], \
+              community_members))
+            follower_overlap = len(self._intersection(user['followers'], \
+              community_members))
             #num of times user occurs in follower/friends of 
             #people in community
             community_friends = pop_stats.all_relation('friends')
@@ -73,8 +77,10 @@ class Population(object):
                 target = word[1:]
                 if target in community_members:
                     reply_score += 1
-            #just total or should we weight? Probably should normalize for current population size somehow
-            score = follower_overlap + friend_overlap + friended + followed + reply_score
+            #just total or should we weight? Probably should normalize
+            #for current population size some how
+            score = follower_overlap + friend_overlap + \
+              friended + followed + reply_score
         else:
             score = 0
         return score
@@ -87,7 +93,8 @@ class Population(object):
             friended = community_friends.count(user)
             community_follows = stats.all_relation('followers')
             followed = community_follows.count(user)
-            #just total or should we weight? Probably should normalize for current population size somehow
+            #just total or should we weight? Probably should normalize
+            #for current population size somehow
             score = friended + followed
         else:
             score = 0
