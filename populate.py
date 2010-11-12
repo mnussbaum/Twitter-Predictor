@@ -3,10 +3,10 @@ from time import sleep
 from twitter import TwitterHTTPError
 from twitter_user import TwitterUser
 from stats import PopulationStats, UserStats
+from utils import write_output
 
 #TODO decide on population size and how many followers do to take from each person
 #TODO decide weighting for filled user score
-#TODO more granular caching
 
 class Population(object):
     '''Gathers a population of interconnected twitter users.'''
@@ -17,12 +17,14 @@ class Population(object):
         self._max_friends_per_user = max_friends_per_user
         self._community = []
 
-    def populate(self):
+    def populate(self, write_path=None):
         '''Gather a group of TwitterUsers. Tries to choose a highly
         interconnected group.''' 
         root_user = TwitterUser(self._root_user_name)
         root_node = root_user.get_all_data()
         self._community.append(root_node)
+        #save with every new user
+        write_output(self._community, write_path)
         root_score = self._filled_user_score(root_node)
         #user scores determine how interconnected a user is
         nodes = {root_score:root_node}
@@ -42,14 +44,17 @@ class Population(object):
                     sleep(1)
                     new_user = tu.get_all_data()
                     self._community.append(new_user)
+                    #save with every new user
+                    if write_path:
+                        write_output(self._community, write_path)
                     new_user_score = self._filled_user_score(new_user)
                     nodes[new_user_score] = new_user
                 except TwitterHTTPError:
                     pass
 
-    def get_community(self):
+    def get_community(self, write_path=None):
         if not self._community:
-            self.populate()
+            self.populate(write_path)
         return self._community
 
     def _filled_user_score(self, user):

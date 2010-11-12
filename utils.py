@@ -19,9 +19,6 @@ def read_output(out_file):
 
 def get_community(root_name, max_people=10, max_followers_per_person=2,\
    write=False, out_file="", write_dir=""):
-    pop = Population(root_name, max_people, max_followers_per_person)
-    pop.populate()
-    community = pop.get_community()
     if write:
         if out_file:
             file_name = out_file
@@ -29,7 +26,12 @@ def get_community(root_name, max_people=10, max_followers_per_person=2,\
             file_name = "pickled_" + str(datetime.now()).split()[0]
         
         if write_dir:
-            write_output(community, "%s%s" % (write_dir, file_name))
+            write_path = "%s%s" % (write_dir, file_name))
         else:
-            write_output(community, file_name)
+            write_path = file_name
+    else:
+        write_path = None
+    pop = Population(root_name, max_people, max_followers_per_person)
+    pop.populate(write_path)
+    community = pop.get_community(write_path)
     return community
