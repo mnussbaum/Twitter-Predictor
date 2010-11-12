@@ -3,6 +3,8 @@ from time import sleep
 import twitter
 from twitter.oauth import OAuth
 
+#TODO get longer friends/follower lists, get more tweets
+
 class TwitterUser(object):
     '''Pulls information about a twitter screen name.'''
 
