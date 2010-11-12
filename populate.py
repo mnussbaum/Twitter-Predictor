@@ -7,6 +7,7 @@ import utils
 
 #TODO decide on population size and how many followers do to take from each person
 #TODO decide weighting for filled user score
+#TODO decide weighting for scores derived from partially filled populations
 
 class Population(object):
     '''Gathers a population of interconnected twitter users.'''
