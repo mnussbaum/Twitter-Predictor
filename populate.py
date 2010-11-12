@@ -3,7 +3,7 @@ from time import sleep
 from twitter import TwitterHTTPError
 from twitter_user import TwitterUser
 from stats import PopulationStats, UserStats
-from utils import write_output
+import utils
 
 #TODO decide on population size and how many followers do to take from each person
 #TODO decide weighting for filled user score
@@ -24,7 +24,7 @@ class Population(object):
         root_node = root_user.get_all_data()
         self._community.append(root_node)
         #save with every new user
-        write_output(self._community, write_path)
+        utils.write_output(self._community, write_path)
         root_score = self._filled_user_score(root_node)
         #user scores determine how interconnected a user is
         nodes = {root_score:root_node}
@@ -46,7 +46,7 @@ class Population(object):
                     self._community.append(new_user)
                     #save with every new user
                     if write_path:
-                        write_output(self._community, write_path)
+                        utils.write_output(self._community, write_path)
                     new_user_score = self._filled_user_score(new_user)
                     nodes[new_user_score] = new_user
                 except TwitterHTTPError:
