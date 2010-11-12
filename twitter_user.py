@@ -3,7 +3,8 @@ from time import sleep
 import twitter
 from twitter.oauth import OAuth
 
-#TODO get longer friends/follower lists, get more tweets
+#TODO get longer friends/follower lists right now can only get 100
+#TODO might be possible to get retweets with include_rts parameter, investigate
 
 class TwitterUser(object):
     '''Pulls information about a twitter screen name.'''
@@ -40,7 +41,7 @@ class TwitterUser(object):
     def _get_tweets(self):
         '''Tweets come with lots of metadata, only keeping some of it.'''
         raw_tweets = self._twit.statuses.user_timeline(screen_name=\
-          self._uname)
+          self._uname, count=200)
         trimmed_tweets = []
         desired_fields = ['created_at', 'favorited', 'geo', 'coordinates', \
           'id', 'in_reply_to_screen_name', 'in_reply_to_status_id', \
