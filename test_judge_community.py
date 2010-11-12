@@ -5,10 +5,10 @@ pp = PrettyPrinter(indent=4)
 from datetime import datetime
 from populate import Population
 from stats import PopulationStats
-from utils import write_output, get_community, read_output
+from utils import write_output, read_output
 
 def main():
-    community = read_output('pickled_populations/test2')
+    community = read_output('pickled_populations/test3')
     s = PopulationStats(community)
     community_members = s.all_users()
     print 'Community Members:'
