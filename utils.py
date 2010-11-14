@@ -13,5 +13,5 @@ def read_output(out_file):
         existing_records = pickle.load(f)
         f.close()
     except IOError:
-        existing_records = {} 
+        existing_records = []
     return existing_records
