@@ -9,10 +9,12 @@ def write_output(data, out_file):
     
 
 def read_output(out_file):
+    print out_file
     try:
         f = open(out_file, 'r')
         existing_records = pickle.load(f)
         f.close()
     except IOError:
+        print 'IO ERROR'
         existing_records = []
     return existing_records
