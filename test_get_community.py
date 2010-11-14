@@ -9,18 +9,18 @@ from populate import Population
 def main():
     community = get_community('nuss08', write=True, \
       out_file="testing_community", \
-      write_dir="pickled_populations/", new=True)
+      write_dir="pickled_populations/", new_community=True)
     print 'First round of gathering:'
     pp.pprint(community)
     community = get_community('nuss08', max_people=20, \
       write=True, out_file="testing_community", \
-      write_dir="pickled_populations/", new=False)
+      write_dir="pickled_populations/", new_community=False)
     print 'Second round of gathering:'
     pp.pprint(community)
 
     
-def get_new_community(root_name, max_people=10, max_followers_per_person=2,\
-   write=False, out_file="", write_dir=""):
+def get_community(root_name, max_people=10, max_followers_per_person=2,\
+   write=False, out_file="", write_dir="", new_community=True):
     if write:
         if out_file:
             file_name = out_file

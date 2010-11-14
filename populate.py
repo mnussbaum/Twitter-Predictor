@@ -45,7 +45,7 @@ class Population(object):
         elif not self._new:
             self._resume_populate()
 
-    def _intial_populate(self):
+    def _initial_populate(self):
         '''Gather a group of TwitterUsers. Tries to choose a highly
         interconnected group.''' 
         root_user = TwitterUser(self._root_user_name)

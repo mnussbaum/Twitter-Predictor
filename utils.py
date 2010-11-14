@@ -6,6 +6,7 @@ def write_output(data, out_file):
     pickle.dump(data, f)
     f.close()
     print 'written'
+    
 
 def read_output(out_file):
     try:
