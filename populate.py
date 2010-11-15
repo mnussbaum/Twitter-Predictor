@@ -52,7 +52,6 @@ class Population(object):
         self._community_members.append(root_node)
         root_score = self._filled_user_score(root_node)
         #user scores determine how interconnected a user is
-        #TODO reverse keys and values, change in sort as well
         self._node_pool[self._root_user_id] = {'user':root_node, 'score':root_score}
         self._save()
         self._resume_populate()
@@ -64,6 +63,7 @@ class Population(object):
         while self._node_pool and len(self._community_members) < self._max_population:
             #choose person on list with highest interconnection
             #first 0 at end of line is to take first user, second 0 get's user's id from tuple result
+            self._rescore_node_pool()
             highest_scoring_id = sorted(self._node_pool.items(), key=lambda item: item[1]['score'], reverse=True)[0][0]
             curr_node = self._node_pool[highest_scoring_id]['user']
             #once a user is chosen for evaluation pop him off the node list
@@ -91,6 +91,11 @@ class Population(object):
 
     def get_community(self):
         return self._community
+        
+    def _rescore_node_pool(self):
+        for node_id in self._node_pool:
+            curr_node = self._node_pool[node_id]
+            curr_node['score'] = self._filled_user_score(curr_node['user'])
 
     def _filled_user_score(self, user):
         '''The score for a user for where user is the result of a TwitterUser object.'''
