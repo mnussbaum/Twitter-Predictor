@@ -7,8 +7,6 @@ from populate import Population
 from stats import PopulationStats
 from utils import write_output, read_output
 
-#TODO make a much better way to judge community
-
 def main():
     community = read_output('pickled_populations/testing_community_ids')
     s = PopulationStats(community['members'])

@@ -7,7 +7,6 @@ from errors import TooManyFriendsOrFollowers
 import utils
 
 #TODO make @replies count again
-#TODO make scores update with every iteration
 
 class Population(object):
     '''Gathers a population of interconnected twitter users.'''
