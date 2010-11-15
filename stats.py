@@ -53,6 +53,13 @@ class PopulationStats(object):
         for user in self._population:
             user_ids.append(user['uid'])
         return user_ids
+    
+    def all_user_names(self):
+        '''All user screen names.'''
+        user_names = []
+        for user in self._population:
+            user_names.append(user['screen_name'])
+        return user_names
 
     def all_relation(self, list_name):
         '''Get all followers/friends names.'''
