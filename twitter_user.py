@@ -3,6 +3,8 @@ from time import sleep
 import twitter
 from twitter.oauth import OAuth
 
+from errors import TooManyFriendsOrFollowers
+
 from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=4)
 
@@ -41,7 +43,7 @@ class TwitterUser(object):
         trimmed_tweets = []
         desired_fields = ['created_at', 'favorited', 'geo', 'coordinates', \
           'id', 'in_reply_to_screen_name', 'in_reply_to_status_id', \
-          'place', 'retweet_count', 'retweeted', 'text','truncated']
+          'place', 'retweet_count', 'retweeted', 'text','truncated', 'user']
         for tweet in raw_tweets:
             new_tweet = {}
             for field in tweet:
@@ -49,16 +51,26 @@ class TwitterUser(object):
                     new_tweet[field] = tweet[field]
             trimmed_tweets.append(new_tweet)
         return trimmed_tweets
+        
+    def _user_data_from_tweets(self, tweets):
+        most_recent_tweet = tweets[0]
+        friend_count = most_recent_tweet['user']['friends_count']
+        follower_count = most_recent_tweet['user']['followers_count']
+        return friend_count, follower_count
 
     def get_all_data(self):
         '''Runs all data gathering methods, returns results.'''
         self._timestamp = datetime.now()
+        tweets = self._get_tweets()
+        friend_count, follower_count = self._user_data_from_tweets(tweets)
+        if friend_count > 5000 or follower_count > 5000:
+           raise TooManyFriendsOrFollowers('too many')
+        sleep(1)
         follower_ids = self._get_follower_ids()
         sleep(1)
-        friend_ids = self._get_friend_ids()
-        sleep(1)
-        tweets = self._get_tweets()
+        friend_ids = self._get_friend_ids()        
         sleep(1)
         result = {'tweets':tweets, 'friend_ids':friend_ids, 'follower_ids':follower_ids, \
-          'uid':self._uid, 'timestamp':self._timestamp}
+          'uid':self._uid, 'timestamp':self._timestamp, 'friend_count':friend_count, \
+          'follower_count':follower_count}
         return result

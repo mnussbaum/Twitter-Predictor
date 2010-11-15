@@ -3,6 +3,7 @@ from time import sleep
 from twitter import TwitterHTTPError
 from twitter_user import TwitterUser
 from stats import PopulationStats, UserStats
+from errors import TooManyFriendsOrFollowers
 import utils
 
 #TODO decide on population size and how many followers do to take from each person
@@ -67,18 +68,22 @@ class Population(object):
             #choose friends by rank to add to community, seems to work
             #better then followers
             friend_ids = self._sort_by_empty_score(curr_node['friend_ids'])
-            for friend_id in friend_ids[:self._max_friends_per_user]:
-                try:
-                    tu = TwitterUser(friend_id)
-                    sleep(1)
-                    new_user = tu.get_all_data()
-                    self._community_members.append(new_user)
-                    new_user_score = self._filled_user_score(new_user)
-                    self._node_pool[new_user_score] = new_user
-                    self._save()
-                except TwitterHTTPError:
-                    print 'TWITTER HTTP ERROR'
-                    return
+            added_count = 0
+            for friend_id in friend_ids:
+                if added_count <= self._max_friends_per_user:
+                    try:
+                        tu = TwitterUser(friend_id)
+                        sleep(1)
+                        new_user = tu.get_all_data()
+                        self._community_members.append(new_user)
+                        new_user_score = self._filled_user_score(new_user)
+                        self._node_pool[new_user_score] = new_user
+                        self._save()
+                        added_count += 1
+                    except TwitterHTTPError:
+                        pass
+                    except TooManyFriendsOrFollowers:
+                        pass
     
     def _resume_populate(self):
         '''Gather a group of TwitterUsers. Tries to choose a highly
@@ -95,17 +100,22 @@ class Population(object):
             #choose friends by rank to add to community, seems to work
             #better then followers
             friend_ids = self._sort_by_empty_score(curr_node['friend_ids'])
-            for friend_id in friend_ids[:self._max_friends_per_user]:
-                try:
-                    tu = TwitterUser(friend_id)
-                    sleep(1)
-                    new_user = tu.get_all_data()
-                    self._community_members.append(new_user)
-                    new_user_score = self._filled_user_score(new_user)
-                    self._node_pool[new_user_score] = new_user
-                    self._save()
-                except TwitterHTTPError:
-                    pass
+            added_count = 0
+            for friend_id in friend_ids:
+                if added_count <= self._max_friends_per_user:
+                    try:
+                        tu = TwitterUser(friend_id)
+                        sleep(1)
+                        new_user = tu.get_all_data()
+                        self._community_members.append(new_user)
+                        new_user_score = self._filled_user_score(new_user)
+                        self._node_pool[new_user_score] = new_user
+                        self._save()
+                        added_count += 1
+                    except TwitterHTTPError:
+                        pass
+                    except TooManyFriendsOrFollowers:
+                        pass
 
     def get_community(self):
         return self._community
