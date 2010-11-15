@@ -56,13 +56,14 @@ class TwitterUser(object):
         most_recent_tweet = tweets[0]
         friend_count = most_recent_tweet['user']['friends_count']
         follower_count = most_recent_tweet['user']['followers_count']
-        return friend_count, follower_count
+        screen_name = most_recent_tweet['user']['screen_name']
+        return friend_count, follower_count, screen_name
 
     def get_all_data(self):
         '''Runs all data gathering methods, returns results.'''
         self._timestamp = datetime.now()
         tweets = self._get_tweets()
-        friend_count, follower_count = self._user_data_from_tweets(tweets)
+        friend_count, follower_count, screen_name = self._user_data_from_tweets(tweets)
         if friend_count > 5000 or follower_count > 5000:
            raise TooManyFriendsOrFollowers('too many')
         sleep(1)
@@ -72,5 +73,5 @@ class TwitterUser(object):
         sleep(1)
         result = {'tweets':tweets, 'friend_ids':friend_ids, 'follower_ids':follower_ids, \
           'uid':self._uid, 'timestamp':self._timestamp, 'friend_count':friend_count, \
-          'follower_count':follower_count}
+          'follower_count':follower_count, 'screen_name':screen_name}
         return result
