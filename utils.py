@@ -16,5 +16,5 @@ def read_output(out_file):
         f.close()
     except IOError:
         print 'IO ERROR'
-        existing_records = []
+        return
     return existing_records

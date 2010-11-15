@@ -6,10 +6,8 @@ from stats import PopulationStats, UserStats
 from errors import TooManyFriendsOrFollowers
 import utils
 
-#TODO decide on population size and how many followers do to take from each person
-#TODO decide weighting for filled user score
-#TODO decide weighting for scores derived from partially filled populations
-#TODO right now our scores give us lots of celebs, this good? If not then fix.
+#TODO make @replies count again
+#TODO make scores update with every iteration
 
 class Population(object):
     '''Gathers a population of interconnected twitter users.'''
@@ -57,7 +55,6 @@ class Population(object):
         #TODO reverse keys and values, change in sort as well
         self._node_pool[root_score] = root_node
         self._save()
-        #TODO what's a good number of users?
         while self._node_pool and len(self._community_members) < self._max_population:
             #choose person on list with highest interconnection
             highest_score = sorted(self._node_pool, key=self._node_pool.__getitem__, reverse=False)[0]
@@ -81,7 +78,7 @@ class Population(object):
                         self._save()
                         added_count += 1
                     except TwitterHTTPError:
-                        pass
+                        return
                     except TooManyFriendsOrFollowers:
                         pass
     
@@ -89,7 +86,6 @@ class Population(object):
         '''Gather a group of TwitterUsers. Tries to choose a highly
         interconnected group. Picks up where a previous _populate()
         call stopped''' 
-        #TODO what's a good number of users?
         while self._node_pool and len(self._community_members) < self._max_population:
             #choose person on list with highest interconnection
             highest_score = sorted(self._node_pool, key=self._node_pool.__getitem__, reverse=False)[0]
@@ -113,7 +109,7 @@ class Population(object):
                         self._save()
                         added_count += 1
                     except TwitterHTTPError:
-                        pass
+                        return
                     except TooManyFriendsOrFollowers:
                         pass
 
@@ -128,18 +124,21 @@ class Population(object):
             #num of user's followers/friends in the community
             friend_overlap = len(self._intersection(user['friend_ids'], \
               community_member_ids))
+            try:
+                friend_percent_overlap = friend_overlap/user['friend_count']
+            except ZeroDivisionError:
+                friend_percent_overlap = 0
             follower_overlap = len(self._intersection(user['follower_ids'], \
               community_member_ids))
-            #num of times user occurs in follower/friends of 
-            #people in community
-            community_friend_ids = pop_stats.all_relation('friend_ids')
-            friended = community_friend_ids.count(user)
-            community_follow_ids = pop_stats.all_relation('follower_ids')
-            followed = community_follow_ids.count(user)
+            try:
+                follower_percent_overlap = follower_overlap/user['follower_count']
+            except ZeroDivisionError:
+                follower_percent_overlap = 0
+            
             #at replies to members of the community
             reply_score = 0
             user_stats = UserStats(user, self._community_members)
-            #TODO change this to use tweet metadata
+            #TODO add @replies here
             '''
             replies = user_stats.replies()
             for reply in replies:
@@ -148,10 +147,8 @@ class Population(object):
                 if target in community_member_names:
                     reply_score += 1
             '''
-            #TODO just total or should we weight? Probably should normalize
-            #for current population size some how
-            score = follower_overlap + friend_overlap + \
-              friended + followed #+ reply_score
+            score = follower_percent_overlap + friend_percent_overlap
+            #+ reply_score
         else:
             score = 0
         return score
@@ -164,8 +161,6 @@ class Population(object):
             friended = community_friend_ids.count(user_id)
             community_follow_ids = stats.all_relation('follower_ids')
             followed = community_follow_ids.count(user_id)
-            #TODO just total or should we weight? Probably should normalize
-            #for current population size somehow
             score = friended + followed
         else:
             score = 0

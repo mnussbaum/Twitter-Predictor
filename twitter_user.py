@@ -8,7 +8,6 @@ from errors import TooManyFriendsOrFollowers
 from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=4)
 
-#TODO get longer friends/follower lists right now can only get 100
 #TODO might be possible to get retweets with include_rts parameter, investigate
 
 class TwitterUser(object):
