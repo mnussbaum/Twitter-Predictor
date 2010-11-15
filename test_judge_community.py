@@ -12,17 +12,15 @@ from utils import write_output, read_output
 def main():
     community = read_output('pickled_populations/testing_community_ids')
     s = PopulationStats(community['members'])
-    community_member_names = s.all_user_ids()
+    community_member_names = s.all_user_names()
     print 'Community Members:'
     pp.pprint(community_member_names)
-    print '\nFollower list overlap (keys are user names, ' +\
-      'values are a list their followers who occur on more' +\
-      ' then one follower list in the community):'
-    pp.pprint(s.relation_list_overlap('follower_ids'))
-    print '\nFriend list overlap (keys are user names, ' +\
-      'values are a list their friends who occur on more' +\
-      ' then one friend list in the community):'
-    pp.pprint(s.relation_list_overlap('friend_ids'))
-
+    for user in community['members']:
+        print '\n'
+        print 'User:', user['screen_name']
+        print 'Tweet Count:', len(user['tweets'])
+        print 'Friend IDs:', len(user['friend_ids'])
+        print 'Follower IDs:', len(user['follower_ids'])
+             
 if __name__=="__main__":
    main()
