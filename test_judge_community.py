@@ -8,19 +8,19 @@ from stats import PopulationStats
 from utils import write_output, read_output
 
 def main():
-    community = read_output('pickled_populations/testing_community')
+    community = read_output('pickled_populations/testing_community_ids')
     s = PopulationStats(community['members'])
-    community_member_names = s.all_users()
+    community_member_names = s.all_user_ids()
     print 'Community Members:'
     pp.pprint(community_member_names)
     print '\nFollower list overlap (keys are user names, ' +\
       'values are a list their followers who occur on more' +\
       ' then one follower list in the community):'
-    pp.pprint(s.relation_list_overlap('followers'))
+    pp.pprint(s.relation_list_overlap('follower_ids'))
     print '\nFriend list overlap (keys are user names, ' +\
       'values are a list their friends who occur on more' +\
       ' then one friend list in the community):'
-    pp.pprint(s.relation_list_overlap('friends'))
+    pp.pprint(s.relation_list_overlap('friend_ids'))
 
 if __name__=="__main__":
    main()

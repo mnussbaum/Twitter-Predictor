@@ -8,15 +8,15 @@ from populate import Population
 
 def main():
     #first round of gathering
-    community = get_community('nuss08', write=True, \
-      out_file="testing_community", \
+    community = get_community(49893981, write=True, \
+      max_people=3, out_file="testing_community_ids", \
       write_dir="pickled_populations/", new_community=True)
     #second round of gathering 
-    community = get_community('nuss08', max_people=20, \
-      write=True, out_file="testing_community", \
+    community = get_community(49893981, max_people=4, \
+      write=True, out_file="testing_community_ids", \
       write_dir="pickled_populations/", new_community=False)
     
-def get_community(root_name, max_people=10, max_followers_per_person=2,\
+def get_community(root_id, max_people=10, max_followers_per_person=2,\
    write=False, out_file="", write_dir="", new_community=True):
     if write:
         if out_file:
@@ -30,7 +30,7 @@ def get_community(root_name, max_people=10, max_followers_per_person=2,\
             write_path = file_name
     else:
         write_path = None
-    pop = Population(root_name, max_people, max_followers_per_person, \
+    pop = Population(root_id, max_people, max_followers_per_person, \
       write_path, new=new_community)
     pop.populate()
     community = pop.get_community()

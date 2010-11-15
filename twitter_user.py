@@ -3,45 +3,41 @@ from time import sleep
 import twitter
 from twitter.oauth import OAuth
 
+from pprint import PrettyPrinter
+pp = PrettyPrinter(indent=4)
+
 #TODO get longer friends/follower lists right now can only get 100
 #TODO might be possible to get retweets with include_rts parameter, investigate
 
 class TwitterUser(object):
     '''Pulls information about a twitter screen name.'''
 
-    def __init__(self, user_screen_name):
+    def __init__(self, uid):
         '''Twitter OAuth tokens and secrets, necessary for
         logging in to get higher rate-limit.'''
         con_secret = '3fxVf35NsyWhepbAYnDijr5uVK1jnTEIQwuSOaFbqA'
         con_secret_key = 'trIWfh6cLrWtX75DLgTGA'
         token = '49893981-FjrShAQdJCTYsITL81QZJRlzq4KVMd2dBg6Z8h1ax'
         token_key = 'xkCRbB5nBRl9niuC4gYgpOd0ka3tIf391SNmBEdRBs0'
-        self._uname = user_screen_name      
-        self._timestamp = datetime.now()
+        self._uid = uid      
         self._twit = twitter.Twitter(auth=OAuth(token, token_key, \
           con_secret, con_secret_key))
 
-    def _get_followers(self):
-        raw_followers = self._twit.statuses.followers(screen_name=\
-          self._uname)
-        followers = []
-        for rf in raw_followers:
-            followers.append(rf['screen_name'])
-        return followers
+    def _get_follower_ids(self):
+        follower_ids = self._twit.followers.ids(user_id=\
+          self._uid)        
+        return follower_ids
 
-    def _get_friends(self):
+    def _get_friend_ids(self):
         '''Friends are people a user follows.'''
-        raw_friends = self._twit.statuses.friends(screen_name=\
-          self._uname)
-        friends = []
-        for rf in raw_friends:
-            friends.append(rf['screen_name'])
-        return friends
+        friend_ids = self._twit.friends.ids(user_id=\
+          self._uid)
+        return friend_ids
 
     def _get_tweets(self):
         '''Tweets come with lots of metadata, only keeping some of it.'''
-        raw_tweets = self._twit.statuses.user_timeline(screen_name=\
-          self._uname, count=200)
+        raw_tweets = self._twit.statuses.user_timeline(user_id=\
+          self._uid, count=200)
         trimmed_tweets = []
         desired_fields = ['created_at', 'favorited', 'geo', 'coordinates', \
           'id', 'in_reply_to_screen_name', 'in_reply_to_status_id', \
@@ -56,12 +52,13 @@ class TwitterUser(object):
 
     def get_all_data(self):
         '''Runs all data gathering methods, returns results.'''
-        followers = self._get_followers()
+        self._timestamp = datetime.now()
+        follower_ids = self._get_follower_ids()
         sleep(1)
-        friends = self._get_friends()
+        friend_ids = self._get_friend_ids()
         sleep(1)
         tweets = self._get_tweets()
         sleep(1)
-        result = {'tweets':tweets, 'friends':friends, 'followers':followers, \
-          'screen_name':self._uname, 'timestamp':self._timestamp}
+        result = {'tweets':tweets, 'friend_ids':friend_ids, 'follower_ids':follower_ids, \
+          'uid':self._uid, 'timestamp':self._timestamp}
         return result
