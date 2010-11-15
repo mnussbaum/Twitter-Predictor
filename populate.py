@@ -55,34 +55,8 @@ class Population(object):
         #TODO reverse keys and values, change in sort as well
         self._node_pool[self._root_user_id] = {'user':root_node, 'score':root_score}
         self._save()
-        while self._node_pool and len(self._community_members) < self._max_population:
-            #choose person on list with highest interconnection
-            #first 0 at end of line is to take first user, second 0 get's user's id from tuple result
-            highest_scoring_id = sorted(self._node_pool.items(), key=lambda item: item[1]['score'], reverse=True)[0][0]
-            curr_node = self._node_pool[highest_scoring_id]['user']
-            #once a user is chosen for evaluation pop him off the node list
-            del self._node_pool[highest_scoring_id]
-            self._save()
-            #choose friends by rank to add to community, seems to work
-            #better then followers
-            friend_ids = self._sort_by_empty_score(curr_node['friend_ids'])
-            added_count = 0
-            for friend_id in friend_ids:
-                if added_count <= self._max_friends_per_user:
-                    try:
-                        tu = TwitterUser(friend_id)
-                        sleep(1)
-                        new_user = tu.get_all_data()
-                        self._community_members.append(new_user)
-                        new_user_score = self._filled_user_score(new_user)
-                        self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
-                        self._save()
-                        added_count += 1
-                    except TwitterHTTPError:
-                        return
-                    except TooManyFriendsOrFollowers:
-                        pass
-    
+        self._resume_populate()
+            
     def _resume_populate(self):
         '''Gather a group of TwitterUsers. Tries to choose a highly
         interconnected group. Picks up where a previous _populate()
