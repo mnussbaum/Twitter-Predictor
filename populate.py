@@ -1,5 +1,7 @@
 import random
 from time import sleep
+import logging
+from __init__ import LOG_FILENAME
 from twitter import TwitterHTTPError
 from twitter_user import TwitterUser
 from stats import PopulationStats, UserStats
@@ -16,6 +18,7 @@ class Population(object):
         '''Either load a prexisting community to add to or start a new one.
         If not starting a new community then root_user_id doesn't do anything.
         Community is loaded/saved to community_file.'''
+        logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
         self._new = new
         self._write_path = community_file
         self._max_population = max_population
@@ -52,6 +55,7 @@ class Population(object):
         root_score = self._filled_user_score(root_node)
         #user scores determine how interconnected a user is
         self._node_pool[self._root_user_id] = {'user':root_node, 'score':root_score}
+        logging.debug('Adding root to node_pool')
         self._save()
         self._resume_populate()
             
@@ -68,6 +72,7 @@ class Population(object):
             #once a user is chosen for evaluation pop him off the node list
             del self._node_pool[highest_scoring_id]
             self._save()
+            logging.debug('Deleting node from node pool')
             #choose friends by rank to add to community, seems to work
             #better then followers
             friend_ids = self._sort_by_empty_score(curr_node['friend_ids'])
@@ -78,14 +83,19 @@ class Population(object):
                         tu = TwitterUser(friend_id)
                         sleep(1)
                         new_user = tu.get_all_data()
+                        #TODO add some sort of conditions for addition to the community
                         self._community_members.append(new_user)
+                        logging.debug('Adding a TwitterUser to community')
                         new_user_score = self._filled_user_score(new_user)
                         self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
                         self._save()
                         added_count += 1
+                        logging.debug('Adding TwitterUser to node_pool')
                     except TwitterHTTPError:
+                        logging.debug('Hit rate limit, quitting')
                         return
                     except TooManyFriendsOrFollowers:
+                        logging.debug('TwitterUser reject, too many friends/followers')
                         pass
 
     def get_community(self):
