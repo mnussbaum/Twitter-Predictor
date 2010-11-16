@@ -53,10 +53,15 @@ class TwitterUser(object):
         return trimmed_tweets
         
     def _user_data_from_tweets(self, tweets):
-        most_recent_tweet = tweets[0]
-        friend_count = most_recent_tweet['user']['friends_count']
-        follower_count = most_recent_tweet['user']['followers_count']
-        screen_name = most_recent_tweet['user']['screen_name']
+        if tweets:
+            most_recent_tweet = tweets[0]
+            friend_count = most_recent_tweet['user']['friends_count']
+            follower_count = most_recent_tweet['user']['followers_count']
+            screen_name = most_recent_tweet['user']['screen_name']
+        else:
+            friend_count = 0
+            follower_count = 0
+            screen_name = ""
         return friend_count, follower_count, screen_name
 
     def get_all_data(self):
