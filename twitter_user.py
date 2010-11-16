@@ -10,6 +10,7 @@ pp = PrettyPrinter(indent=4)
 
 #TODO might be possible to get retweets with include_rts parameter, investigate
 #TODO raise exception on users who haven't posted in the past day
+#TODO raise exception is user has 0 tweets
 
 class TwitterUser(object):
     '''Pulls information about a twitter screen name.'''
