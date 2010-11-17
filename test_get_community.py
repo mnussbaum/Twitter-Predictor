@@ -9,14 +9,14 @@ from populate import Population
 def main():
     #first round of gathering
     community = get_community(49893981, write=True, \
-      max_people=5, out_file="testing_community_ids", \
-      write_dir="pickled_populations/", new_community=True)
-    print 'DONE ROUND ONE'
-    #second round of gathering 
-    community = get_community(49893981, max_people=10, \
-      write=True, out_file="testing_community_ids", \
+      max_people=50, max_followers_per_person=5, out_file="testing_community_ids", \
       write_dir="pickled_populations/", new_community=False)
-    print 'DONE ROUND TWO'
+    #print 'DONE ROUND ONE'
+    #second round of gathering 
+    #community = get_community(49893981, max_people=10, \
+    #  write=True, out_file="testing_community_ids", \
+    #  write_dir="pickled_populations/", new_community=False)
+    #print 'DONE ROUND TWO'
 
 def get_community(root_id, max_people=10, max_followers_per_person=2,\
    write=False, out_file="", write_dir="", new_community=True):

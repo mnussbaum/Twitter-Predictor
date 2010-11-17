@@ -11,10 +11,9 @@ def main():
     community = read_output('pickled_populations/testing_community_ids')
     s = PopulationStats(community['members'])
     community_member_names = s.all_user_names()
-    print 'Community Members:'
-    pp.pprint(community_member_names)
+    print 'Community Members:', len(community['members'])
     for user in community['members']:
-        print '\n'
+        print ''
         print 'User:', user['screen_name']
         print 'Tweet Count:', len(user['tweets'])
         print 'Friend IDs:', len(user['friend_ids'])

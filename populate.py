@@ -18,7 +18,9 @@ class Population(object):
         '''Either load a prexisting community to add to or start a new one.
         If not starting a new community then root_user_id doesn't do anything.
         Community is loaded/saved to community_file.'''
-        logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
+        logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG, 
+          format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+          datefmt='%m-%d %H:%M')
         self._new = new
         self._write_path = community_file
         self._max_population = max_population

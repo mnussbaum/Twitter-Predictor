@@ -23,8 +23,9 @@ class TwitterUser(object):
         token = '49893981-FjrShAQdJCTYsITL81QZJRlzq4KVMd2dBg6Z8h1ax'
         token_key = 'xkCRbB5nBRl9niuC4gYgpOd0ka3tIf391SNmBEdRBs0'
         self._uid = uid      
-        self._twit = twitter.Twitter(auth=OAuth(token, token_key, \
-          con_secret, con_secret_key))
+        self._twit = twitter.Twitter()
+        #self._twit = twitter.Twitter(auth=OAuth(token, token_key, \
+        #  con_secret, con_secret_key))
 
     def _get_follower_ids(self):
         follower_ids = self._twit.followers.ids(user_id=\
