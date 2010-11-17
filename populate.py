@@ -5,7 +5,7 @@ from __init__ import LOG_FILENAME
 from twitter import TwitterHTTPError
 from twitter_user import TwitterUser
 from stats import PopulationStats, UserStats
-from errors import TooManyFriendsOrFollowers
+from errors import BadUser
 import utils
 
 #TODO make @replies count again
@@ -86,7 +86,8 @@ class Population(object):
                         sleep(1)
                         new_user = tu.get_all_data()
                         #TODO add some sort of conditions for addition to the community
-                        self._community_members.append(new_user)
+                        if new_user not in self._community_members:
+                            self._community_members.append(new_user)
                         logging.debug('Adding a TwitterUser to community')
                         new_user_score = self._filled_user_score(new_user)
                         self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
@@ -96,8 +97,8 @@ class Population(object):
                     except TwitterHTTPError:
                         logging.debug('Hit rate limit, quitting')
                         return
-                    except TooManyFriendsOrFollowers:
-                        logging.debug('TwitterUser reject, too many friends/followers')
+                    except BadUser as error:
+                        logging.debug('TwitterUser rejected: %s' % error)
                         pass
 
     def get_community(self):
