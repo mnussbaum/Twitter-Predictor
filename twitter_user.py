@@ -1,9 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import sleep
 import twitter
 from twitter.oauth import OAuth
 
-from errors import TooManyFriendsOrFollowers
+from errors import BadUser
 
 from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=4)
@@ -65,6 +65,27 @@ class TwitterUser(object):
             follower_count = 0
             screen_name = ""
         return friend_count, follower_count, screen_name
+        
+    def _active_tweeter(self, tweets):
+        tweeted_today = False
+        tweeted_yesterday = False
+        for tweet in tweets:
+            raw_timestamp = tweet['created_at']
+            split_timestamp = raw_timestamp.split()
+            month_dict = {"Jan":1, "Feb":2, "Mar":3, "Apr":4, "May":5, \
+              "Jun":6, "Jul":7, "Aug":8, "Sep":9, "Oct":10, "Nov":11, \
+              "Dec":12}
+            year = int(split_timestamp[5])
+            month = int(month_dict[split_timestamp[1]])
+            day = int(split_timestamp[2])
+            formatted_timestamp = datetime(year, month, day)
+            now = datetime.now()
+            time_diff = now - formatted_timestamp
+            if time_diff <= timedelta(days=1):
+                tweeted_today = True
+            if time_diff <= timedelta(days=2) and time_diff > timedelta(days=1):
+                tweeted_yesterday = True
+        return tweeted_today and tweeted_yesterday
 
     def get_all_data(self):
         '''Runs all data gathering methods, returns results.'''
@@ -72,7 +93,9 @@ class TwitterUser(object):
         tweets = self._get_tweets()
         friend_count, follower_count, screen_name = self._user_data_from_tweets(tweets)
         if friend_count > 5000 or follower_count > 5000:
-           raise TooManyFriendsOrFollowers('too many')
+           raise BadUser('too many friends/followers')
+        if not self._active_tweeter(tweets):
+            raise BadUser('not an active tweeter')
         sleep(1)
         follower_ids = self._get_follower_ids()
         sleep(1)
