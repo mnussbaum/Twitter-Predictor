@@ -8,7 +8,7 @@ from stats import PopulationStats, UserStats
 from errors import BadUser
 import utils
 
-#TODO make @replies count again
+#TODO decide on weighting for @replies
 
 class Population(object):
     '''Gathers a population of interconnected twitter users.'''
@@ -88,12 +88,12 @@ class Population(object):
                         #TODO add some sort of conditions for addition to the community
                         if new_user not in self._community_members:
                             self._community_members.append(new_user)
-                        logging.debug('Adding a TwitterUser to community')
+                        logging.debug('TwitterUser accepted to community')
                         new_user_score = self._filled_user_score(new_user)
                         self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
                         self._save()
                         added_count += 1
-                        logging.debug('Adding TwitterUser to node_pool')
+                        logging.debug('TwitterUser accepted to node_pool')
                     except TwitterHTTPError:
                         logging.debug('Hit rate limit, quitting')
                         return
@@ -128,18 +128,12 @@ class Population(object):
             except ZeroDivisionError:
                 follower_percent_overlap = 0
             
-            #at replies to members of the community
             reply_score = 0
             user_stats = UserStats(user, self._community_members)
-            #TODO add @replies here
-            '''
             replies = user_stats.replies()
-            for reply in replies:
-                word = reply['word']
-                target = word[1:]
-                if target in community_member_names:
+            for replying_to in replies:
+                if replying_to in community_member_names:
                     reply_score += 1
-            '''
             score = follower_percent_overlap + friend_percent_overlap
             #+ reply_score
         else:
