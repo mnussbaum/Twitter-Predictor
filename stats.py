@@ -80,10 +80,10 @@ class UserStats(object):
         self._population = population
         self._pop_stats = PopulationStats(self._population)
 
-    def word_data(self):
+    def all_word_data(self):
         '''Returns word counts and neighbors for all of a user's tweets.'''
-        for user in self._population:
-            if user['uid'] == self._uid:
+        for member in self._population:
+            if member['uid'] == self._uid:
                 found = True
                 break
             else:
@@ -97,10 +97,10 @@ class UserStats(object):
         word_data = counter.get_word_data()
         return word_data
 
-    def word_data(self):
+    def individual_word_data(self):
         '''Word counts and neighbors for each of a user's tweets.'''
-        for user in self._population:
-            if user['uid'] == self._uid:
+        for member in self._population:
+            if member['uid'] == self._uid:
                 found = True
                 break
             else:
@@ -127,9 +127,9 @@ class UserStats(object):
 
     def replies(self):
         '''Word data for all the replies in a user's tweets.'''
-        word_data = self._pop_stats.word_data()
-        found_replies = []
-        for word in word_data:
-            if word[0] == "@":
-                found_replies.append(word_data[word])
-        return found_replies
+        responses = []
+        for tweet in self._user['tweets']:
+            in_response_to = tweet['in_reply_to_status_id']
+            if in_response_to:
+                responses.append(in_response_to)
+        return responses
