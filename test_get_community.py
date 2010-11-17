@@ -8,9 +8,9 @@ from populate import Population
 
 def main():
     #first round of gathering
-    community = get_community(49893981, write=True, \
-      max_people=50, max_followers_per_person=5, out_file="testing_community_ids", \
-      write_dir="pickled_populations/", new_community=False)
+    community = get_community(114835465, write=True, \
+      max_people=50, max_followers_per_person=5, out_file="jerwill", \
+      write_dir="pickled_populations/", new_community=True)
     #print 'DONE ROUND ONE'
     #second round of gathering 
     #community = get_community(49893981, max_people=10, \
