@@ -94,8 +94,8 @@ class Population(object):
                         self._save()
                         added_count += 1
                         logging.debug('TwitterUser accepted to node_pool')
-                    except TwitterHTTPError:
-                        logging.debug('Hit rate limit, quitting')
+                    except TwitterHTTPError as error:
+                        logging.debug('Hit rate limit, quitting: %s' % error)
                         return
                     except BadUser as error:
                         logging.debug('TwitterUser rejected: %s' % error)
@@ -131,8 +131,9 @@ class Population(object):
             reply_score = 0
             user_stats = UserStats(user, self._community_members)
             replies = user_stats.replies()
+            member_ids = [user['uid'] for user in self._community_members]
             for replying_to in replies:
-                if replying_to in community_member_names:
+                if replying_to in member_ids:
                     reply_score += 1
             score = follower_percent_overlap + friend_percent_overlap
             #+ reply_score
