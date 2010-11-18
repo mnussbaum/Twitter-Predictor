@@ -13,7 +13,6 @@ def main():
     community_member_names = s.all_user_names()
     print 'Community Members:', len(community['members'])
     for user in community['members']:
-        print user['tweets'][0]
         print ''
         print 'User:', user['screen_name']
         print 'ID:', user['uid']
