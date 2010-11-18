@@ -1,7 +1,6 @@
 from copy import deepcopy
 from word_counts import WordCounter
 
-#TODO get retweets -- it looks like you need to be friends with a user to get their retweets
 
 class PopulationStats(object):
     '''Metrics on a population.'''
