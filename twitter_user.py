@@ -8,22 +8,20 @@ from errors import BadUser
 from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=4)
 
-#TODO might be possible to get retweets with include_rts parameter, investigate
-
 class TwitterUser(object):
     '''Pulls information about a twitter screen name.'''
 
     def __init__(self, uid):
         '''Twitter OAuth tokens and secrets, necessary for
         logging in to get higher rate-limit.'''
-        con_secret = '3fxVf35NsyWhepbAYnDijr5uVK1jnTEIQwuSOaFbqA'
-        con_secret_key = 'trIWfh6cLrWtX75DLgTGA'
-        token = '49893981-FjrShAQdJCTYsITL81QZJRlzq4KVMd2dBg6Z8h1ax'
-        token_key = 'xkCRbB5nBRl9niuC4gYgpOd0ka3tIf391SNmBEdRBs0'
+        con_secret = 'D0yCV2JwUzRstWNvTqDBynT8UbqFSSy7k38MlRHzUK4'
+        con_secret_key = 'fQefIH0xSzeV0q2LqHUsZQ'
+        token = '216605248-QRmiLAmNIKGEQWsNUSJ6MQGDMq6nhiyZqYJo4zTH'
+        token_key = 'dDyY7M4uGrnJ8K7EzTGyuFhazjtW2zEqQlSAOVHmqE'
         self._uid = uid      
-        self._twit = twitter.Twitter()
-        #self._twit = twitter.Twitter(auth=OAuth(token, token_key, \
-        #  con_secret, con_secret_key))
+        #self._twit = twitter.Twitter()
+        self._twit = twitter.Twitter(auth=OAuth(token, token_key, \
+          con_secret, con_secret_key))
 
     def _get_follower_ids(self):
         follower_ids = self._twit.followers.ids(user_id=\
