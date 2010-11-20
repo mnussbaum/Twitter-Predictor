@@ -34,8 +34,11 @@ def get_community(root_id, max_people=10, max_followers_per_person=2,\
         write_path = None
     pop = Population(root_id, max_people, max_followers_per_person, \
       write_path, new=new_community, safe=safe_mode)
-    pop.populate()
-    community = pop.get_community()
+    try:
+        pop.populate()
+        community = pop.get_community()
+    except:
+        pop.save()
     return community
     
 if __name__=="__main__":
