@@ -14,7 +14,7 @@ class Population(object):
     '''Gathers a population of interconnected twitter users.'''
 
     def __init__(self, root_user_id="", max_population=24, \
-      max_friends_per_user=5, community_file="", new=True):
+      max_friends_per_user=5, community_file="", new=True, safe=False):
         '''Either load a prexisting community to add to or start a new one.
         If not starting a new community then root_user_id doesn't do anything.
         Community is loaded/saved to community_file.'''
@@ -25,6 +25,7 @@ class Population(object):
         self._write_path = community_file
         self._max_population = max_population
         self._max_friends_per_user = max_friends_per_user
+        self._safe = safe
         #new community
         if new and root_user_id:
             self._root_user_id = root_user_id
@@ -73,7 +74,8 @@ class Population(object):
             curr_node = self._node_pool[highest_scoring_id]['user']
             #once a user is chosen for evaluation pop him off the node list
             del self._node_pool[highest_scoring_id]
-            self._save()
+            if self._safe:
+                self._save()
             logging.debug('Deleting node from node pool')
             #choose friends by rank to add to community, seems to work
             #better then followers
@@ -94,15 +96,23 @@ class Population(object):
                             logging.debug('TwitterUser accepted to community')
                             new_user_score = self._filled_user_score(new_user)
                             self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
-                            self._save()
+                            if self._safe:
+                                self._save()
+                            print len(self._community_members), " members"
                             added_count += 1
                             logging.debug('TwitterUser accepted to node_pool')
                     except TwitterHTTPError as error:
                         logging.debug('Hit rate limit, quitting: %s' % error)
+                        self._save()
+                        print error
+                        print "Number of members: ", len(self._community_members)
                         return
                     except BadUser as error:
                         logging.debug('TwitterUser rejected: %s' % error)
                         pass
+        self._save()
+        print "Maximum community size reached."
+        print "Number of members: ", len(self._community_members)
 
     def get_community(self):
         return self._community
