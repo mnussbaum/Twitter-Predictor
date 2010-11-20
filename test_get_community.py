@@ -10,7 +10,7 @@ def main():
     #first round of gathering
     community = get_community(819606, write=True, \
       max_people=200, max_followers_per_person=5, out_file="janl_11_20_2010", \
-      write_dir="pickled_populations/", new_community=True)
+      write_dir="pickled_populations/", new_community=False)
     #print 'DONE ROUND ONE'
     #second round of gathering 
     #community = get_community(49893981, max_people=10, \
