@@ -10,7 +10,7 @@ def main():
     #first round of gathering
     community = get_community(60919433, write=True, \
       max_people=200, max_followers_per_person=5, out_file="lizardbill_11_20_2010", \
-      write_dir="pickled_populations/", new_community=False)
+      write_dir="pickled_populations/", new_community=False, safe_mode=False)
     #print 'DONE ROUND ONE'
     #second round of gathering 
     #community = get_community(49893981, max_people=10, \
@@ -19,7 +19,7 @@ def main():
     #print 'DONE ROUND TWO'
 
 def get_community(root_id, max_people=10, max_followers_per_person=2,\
-   write=False, out_file="", write_dir="", new_community=True):
+   write=False, out_file="", write_dir="", new_community=True, safe_mode=False):
     if write:
         if out_file:
             file_name = out_file
@@ -33,7 +33,7 @@ def get_community(root_id, max_people=10, max_followers_per_person=2,\
     else:
         write_path = None
     pop = Population(root_id, max_people, max_followers_per_person, \
-      write_path, new=new_community)
+      write_path, new=new_community, safe=safe_mode)
     pop.populate()
     community = pop.get_community()
     return community
