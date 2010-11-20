@@ -79,21 +79,24 @@ class Population(object):
             #better then followers
             friend_ids = self._sort_by_empty_score(curr_node['friend_ids'])
             added_count = 0
+            community_ids = []
+            for member in self._community_members:
+                community_ids.append(member['uid'])
             for friend_id in friend_ids:
                 if added_count <= self._max_friends_per_user:
                     try:
-                        tu = TwitterUser(friend_id)
-                        sleep(1)
-                        new_user = tu.get_all_data()
-                        #TODO add some sort of conditions for addition to the community
-                        if new_user not in self._community_members:
+                        if friend_id not in community_ids:
+                            tu = TwitterUser(friend_id)
+                            sleep(1)
+                            new_user = tu.get_all_data()
+                            #TODO add some sort of conditions for addition to the community
                             self._community_members.append(new_user)
-                        logging.debug('TwitterUser accepted to community')
-                        new_user_score = self._filled_user_score(new_user)
-                        self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
-                        self._save()
-                        added_count += 1
-                        logging.debug('TwitterUser accepted to node_pool')
+                            logging.debug('TwitterUser accepted to community')
+                            new_user_score = self._filled_user_score(new_user)
+                            self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
+                            self._save()
+                            added_count += 1
+                            logging.debug('TwitterUser accepted to node_pool')
                     except TwitterHTTPError as error:
                         logging.debug('Hit rate limit, quitting: %s' % error)
                         return
