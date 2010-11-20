@@ -59,7 +59,7 @@ class Population(object):
         #user scores determine how interconnected a user is
         self._node_pool[self._root_user_id] = {'user':root_node, 'score':root_score}
         logging.debug('Adding root to node_pool')
-        self._save()
+        self.save()
         self._resume_populate()
             
     def _resume_populate(self):
@@ -75,7 +75,7 @@ class Population(object):
             #once a user is chosen for evaluation pop him off the node list
             del self._node_pool[highest_scoring_id]
             if self._safe:
-                self._save()
+                self.save()
             logging.debug('Deleting node from node pool')
             #choose friends by rank to add to community, seems to work
             #better then followers
@@ -97,20 +97,20 @@ class Population(object):
                             new_user_score = self._filled_user_score(new_user)
                             self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
                             if self._safe:
-                                self._save()
+                                self.save()
                             print len(self._community_members), " members"
                             added_count += 1
                             logging.debug('TwitterUser accepted to node_pool')
                     except TwitterHTTPError as error:
                         logging.debug('Hit rate limit, quitting: %s' % error)
-                        self._save()
+                        self.save()
                         print error
                         print "Number of members: ", len(self._community_members)
                         return
                     except BadUser as error:
                         logging.debug('TwitterUser rejected: %s' % error)
                         pass
-        self._save()
+        self.save()
         print "Maximum community size reached."
         print "Number of members: ", len(self._community_members)
 
@@ -182,7 +182,7 @@ class Population(object):
         intersection = set(first_list).intersection(set(second_list))
         return intersection
         
-    def _save(self):
+    def save(self):
         self._community['node_pool'] = self._node_pool
         self._community['members'] = self._community_members
         utils.write_output(self._community, self._write_path)
