@@ -117,15 +117,12 @@ class Population(object):
                             if self._safe:
                                 self.save()
                             logging.debug('Deleting node from node pool')
-                            pass
                         #otherwise it's probably just a twitter server issue
                         else:
                             logging.debug('Server error, sleeping for 5 secs')
                             sleep(5)
-                            pass
                     except BadUser as error:
                         logging.debug('TwitterUser rejected: %s' % error)
-                        pass
         self.save()
         print "Maximum community size reached."
         print "Number of members: ", len(self._community_members)
