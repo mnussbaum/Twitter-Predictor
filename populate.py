@@ -83,6 +83,8 @@ class Population(object):
             community_ids = []
             for member in self._community_members:
                 community_ids.append(member['uid'])
+            #flag to delete the id we are using from the node pool when finished with it
+            delete_highest_scoring_id = True
             for friend_id in friend_ids:
                 if added_count <= self._max_friends_per_user:
                     try:
@@ -100,17 +102,7 @@ class Population(object):
                             print len(self._community_members), "members"
                             added_count += 1
                             logging.debug('TwitterUser accepted to node_pool')
-                        print 'B'
-                        print 'highest_scoring_id', highest_scoring_id
-                        print 'highest_scoring_id in nodes:', highest_scoring_id in self._node_pool
-                        #once a user is chosen for evaluation pop him off the node list
-                        try:
-                            del self._node_pool[highest_scoring_id]
-                        except KeyError:
-                            print "couldn't delete", highest_scoring_id
-                        if self._safe:
-                            self.save()
-                        logging.debug('Deleting node from node pool')
+                            delete_highest_scoring_id = True
                     except TwitterHTTPError as error:
                         logging.debug('Twitter error: %s' % error)
                         self.save()
@@ -118,26 +110,32 @@ class Population(object):
                         print "Number of members: ", len(self._community_members)
                         #rate limiting error
                         if '400' in str(error) or '420' in str(error):
+                           delete_highest_scoring_id = False
                            logging.debug('Hit rate limit, quitting')
                            return
                         #unauthorized for user error
                         elif '401' in str(error) or '404' in str(error):
-                            try:
-                                del self._node_pool[highest_scoring_id]
-                            except KeyError:
-                                print "in 401: couldn't delete", highest_scoring_id
+                            delete_highest_scoring_id = True
                             if self._safe:
                                 self.save()
-                            logging.debug('Deleting node from node pool')
                         #otherwise it's probably just a twitter server issue
                         else:
+                            delete_highest_scoring_id = False
                             logging.debug('Server error, sleeping for 5 secs')
                             sleep(5)
                     except BadUser as error:
+                        delete_highest_scoring_id = True
                         logging.debug('TwitterUser rejected: %s' % error)
                     except URLError:
+                        delete_highest_scoring_id = False
                         logging.debug('URLError, sleeping for 5 secs')
                         sleep(5)
+                    
+            #once a user is chosen for evaluation pop him off the node list
+            del self._node_pool[highest_scoring_id]
+            if self._safe:
+                self.save()
+            logging.debug('Deleting node from node pool')
         self.save()
         print "Maximum community size reached."
         print "Number of members: ", len(self._community_members)
