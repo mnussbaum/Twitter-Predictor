@@ -1,6 +1,7 @@
 import random
 from time import sleep
 import logging
+from urllib2 import URLError
 from __init__ import LOG_FILENAME
 from twitter import TwitterHTTPError
 from twitter_user import TwitterUser
@@ -113,6 +114,7 @@ class Population(object):
                            return
                         #unauthorized for user error
                         elif '401' or '404' in str(error):
+                            print 'Hit 401'
                             del self._node_pool[highest_scoring_id]
                             if self._safe:
                                 self.save()
@@ -123,6 +125,9 @@ class Population(object):
                             sleep(5)
                     except BadUser as error:
                         logging.debug('TwitterUser rejected: %s' % error)
+                    except URLError:
+                        logging.debug('URLError, sleeping for 5 secs')
+                        sleep(5)
         self.save()
         print "Maximum community size reached."
         print "Number of members: ", len(self._community_members)
