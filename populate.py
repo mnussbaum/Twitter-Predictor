@@ -73,7 +73,9 @@ class Population(object):
             self._rescore_node_pool()
             highest_scoring_id = sorted(self._node_pool.items(), key=lambda item: item[1]['score'], reverse=True)[0][0]
             curr_node = self._node_pool[highest_scoring_id]['user']
-
+            print 'A'
+            print 'highest_scoring_id', highest_scoring_id
+            print 'highest_scoring_id in nodes:', highest_scoring_id in self._node_pool
             #choose friends by rank to add to community, seems to work
             #better then followers
             friend_ids = self._sort_by_empty_score(curr_node['friend_ids'])
@@ -98,10 +100,13 @@ class Population(object):
                             print len(self._community_members), "members"
                             added_count += 1
                             logging.debug('TwitterUser accepted to node_pool')
+                        print 'B'
+                        print 'highest_scoring_id', highest_scoring_id
+                        print 'highest_scoring_id in nodes:', highest_scoring_id in self._node_pool
                         #once a user is chosen for evaluation pop him off the node list
                         try:
                             del self._node_pool[highest_scoring_id]
-                        except:
+                        except KeyError:
                             print "couldn't delete", highest_scoring_id
                         if self._safe:
                             self.save()
@@ -117,11 +122,10 @@ class Population(object):
                            return
                         #unauthorized for user error
                         elif '401' in str(error) or '404' in str(error):
-                            print 'Hit 401'
                             try:
                                 del self._node_pool[highest_scoring_id]
-                            except:
-                                print "couldn't delete", highest_scoring_id
+                            except KeyError:
+                                print "in 401: couldn't delete", highest_scoring_id
                             if self._safe:
                                 self.save()
                             logging.debug('Deleting node from node pool')
