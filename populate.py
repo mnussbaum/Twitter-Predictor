@@ -111,7 +111,7 @@ class Population(object):
                         if '400' or '420' in str(error):
                            return
                         #unauthorized for user error
-                        elif '401' or '404' in error:
+                        elif '401' or '404' in str(error):
                             del self._node_pool[highest_scoring_id]
                             if self._safe:
                                 self.save()
