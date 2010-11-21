@@ -99,7 +99,10 @@ class Population(object):
                             added_count += 1
                             logging.debug('TwitterUser accepted to node_pool')
                         #once a user is chosen for evaluation pop him off the node list
-                        del self._node_pool[highest_scoring_id]
+                        try:
+                            del self._node_pool[highest_scoring_id]
+                        except:
+                            print "couldn't delete", highest_scoring_id
                         if self._safe:
                             self.save()
                         logging.debug('Deleting node from node pool')
@@ -115,7 +118,10 @@ class Population(object):
                         #unauthorized for user error
                         elif '401' in str(error) or '404' in str(error):
                             print 'Hit 401'
-                            del self._node_pool[highest_scoring_id]
+                            try:
+                                del self._node_pool[highest_scoring_id]
+                            except:
+                                print "couldn't delete", highest_scoring_id
                             if self._safe:
                                 self.save()
                             logging.debug('Deleting node from node pool')
