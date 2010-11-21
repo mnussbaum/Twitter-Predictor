@@ -116,6 +116,7 @@ class Population(object):
                             if self._safe:
                                 self.save()
                             logging.debug('Deleting node from node pool')
+                            pass
                         #otherwise it's probably just a twitter server issue
                         else:
                             sleep(5)
