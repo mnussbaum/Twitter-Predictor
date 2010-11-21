@@ -37,9 +37,9 @@ def get_community(root_id, max_people=10, max_followers_per_person=2,\
     try:
         pop.populate()
         community = pop.get_community()
+	return community
     except:
         pop.save()
-    return community
     
 if __name__=="__main__":
    main()
