@@ -72,11 +72,7 @@ class Population(object):
             self._rescore_node_pool()
             highest_scoring_id = sorted(self._node_pool.items(), key=lambda item: item[1]['score'], reverse=True)[0][0]
             curr_node = self._node_pool[highest_scoring_id]['user']
-            #once a user is chosen for evaluation pop him off the node list
-            del self._node_pool[highest_scoring_id]
-            if self._safe:
-                self.save()
-            logging.debug('Deleting node from node pool')
+
             #choose friends by rank to add to community, seems to work
             #better then followers
             friend_ids = self._sort_by_empty_score(curr_node['friend_ids'])
@@ -98,15 +94,32 @@ class Population(object):
                             self._node_pool[friend_id] = {'user':new_user, 'score':new_user_score}
                             if self._safe:
                                 self.save()
-                            print len(self._community_members), " members"
+                            print len(self._community_members), "members"
                             added_count += 1
                             logging.debug('TwitterUser accepted to node_pool')
+                        #once a user is chosen for evaluation pop him off the node list
+                        del self._node_pool[highest_scoring_id]
+                        if self._safe:
+                            self.save()
+                        logging.debug('Deleting node from node pool')
                     except TwitterHTTPError as error:
                         logging.debug('Hit rate limit, quitting: %s' % error)
                         self.save()
                         print error
                         print "Number of members: ", len(self._community_members)
-                        pass
+                        #rate limiting error
+                        if '400' or '420' in str(error):
+                           return
+                        #unauthorized for user error
+                        elif '401' or '404' in error:
+                            del self._node_pool[highest_scoring_id]
+                            if self._safe:
+                                self.save()
+                            logging.debug('Deleting node from node pool')
+                        #otherwise it's probably just a twitter server issue
+                        else:
+                            sleep(5)
+                            pass
                     except BadUser as error:
                         logging.debug('TwitterUser rejected: %s' % error)
                         pass
