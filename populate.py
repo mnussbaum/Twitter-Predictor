@@ -109,6 +109,7 @@ class Population(object):
                         print "Number of members: ", len(self._community_members)
                         #rate limiting error
                         if '400' or '420' in str(error):
+                           logging.debug('Hit rate limit, quitting')
                            return
                         #unauthorized for user error
                         elif '401' or '404' in str(error):
@@ -119,6 +120,7 @@ class Population(object):
                             pass
                         #otherwise it's probably just a twitter server issue
                         else:
+                            logging.debug('Server error, sleeping for 5 secs')
                             sleep(5)
                             pass
                     except BadUser as error:
