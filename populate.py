@@ -109,7 +109,7 @@ class Population(object):
                         print error
                         print "Number of members: ", len(self._community_members)
                         #rate limiting error
-                        if '400' or '420' in str(error):
+                        if '400' in str(error) or '420' in str(error):
                            logging.debug('Hit rate limit, quitting')
                            return
                         #unauthorized for user error
