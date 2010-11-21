@@ -103,7 +103,7 @@ class Population(object):
                             self.save()
                         logging.debug('Deleting node from node pool')
                     except TwitterHTTPError as error:
-                        logging.debug('Hit rate limit, quitting: %s' % error)
+                        logging.debug('Twitter error: %s' % error)
                         self.save()
                         print error
                         print "Number of members: ", len(self._community_members)
