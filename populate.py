@@ -106,7 +106,7 @@ class Population(object):
                         self.save()
                         print error
                         print "Number of members: ", len(self._community_members)
-                        return
+                        pass
                     except BadUser as error:
                         logging.debug('TwitterUser rejected: %s' % error)
                         pass
