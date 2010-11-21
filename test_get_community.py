@@ -38,8 +38,8 @@ def get_community(root_id, max_people=10, max_followers_per_person=2,
         pop.populate()
         community = pop.get_community()
 	return community
-    except:
-        logging.debug('Uncaught exception, quitting')
+    except Exception as error:
+        logging.debug('Uncaught exception, quitting %s' % error)
         pop.save()
     
 if __name__=="__main__":
