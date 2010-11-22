@@ -73,9 +73,6 @@ class Population(object):
             self._rescore_node_pool()
             highest_scoring_id = sorted(self._node_pool.items(), key=lambda item: item[1]['score'], reverse=True)[0][0]
             curr_node = self._node_pool[highest_scoring_id]['user']
-            print 'A'
-            print 'highest_scoring_id', highest_scoring_id
-            print 'highest_scoring_id in nodes:', highest_scoring_id in self._node_pool
             #choose friends by rank to add to community, seems to work
             #better then followers
             friend_ids = self._sort_by_empty_score(curr_node['friend_ids'])
@@ -106,7 +103,6 @@ class Population(object):
                     except TwitterHTTPError as error:
                         logging.debug('Twitter error: %s' % error)
                         self.save()
-                        print error
                         print "Number of members: ", len(self._community_members)
                         #rate limiting error
                         if '400' in str(error) or '420' in str(error):
@@ -129,8 +125,7 @@ class Population(object):
                     except URLError:
                         delete_highest_scoring_id = False
                         logging.debug('URLError, sleeping for 5 secs')
-                        sleep(5)
-                    
+                        sleep(5)                    
             #once a user is chosen for evaluation pop him off the node list
             del self._node_pool[highest_scoring_id]
             if self._safe:
