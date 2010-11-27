@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
 from time import sleep
+
 import twitter
 from twitter.oauth import OAuth
 
 from errors import BadUser
+from utils import parse_twitter_timestamp
 
 from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=4)
@@ -67,14 +69,7 @@ class TwitterUser(object):
         tweeted_yesterday = False
         for tweet in tweets:
             raw_timestamp = tweet['created_at']
-            split_timestamp = raw_timestamp.split()
-            month_dict = {"Jan":1, "Feb":2, "Mar":3, "Apr":4, "May":5, \
-              "Jun":6, "Jul":7, "Aug":8, "Sep":9, "Oct":10, "Nov":11, \
-              "Dec":12}
-            year = int(split_timestamp[5])
-            month = int(month_dict[split_timestamp[1]])
-            day = int(split_timestamp[2])
-            formatted_timestamp = datetime(year, month, day)
+            formatted_timestamp = parse_twitter_timestamp(raw_timestamp)
             now = datetime.now()
             time_diff = now - formatted_timestamp
             if time_diff <= timedelta(days=1):
