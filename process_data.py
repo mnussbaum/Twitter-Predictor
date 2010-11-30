@@ -171,7 +171,8 @@ class UserDatedCounts(object):
             try:
                 LF = math.log(tomorrow_words[word], 10)
                 self.dataset[word]['tomorrow_logfrequency'] = LF
-            except KeyError: pass
+            except KeyError:
+                self.dataset[word]['tomorrow_logfrequency'] = 0
             
             # log frequency of word on day i
             LF = math.log(today_words[word], 10)
@@ -219,7 +220,7 @@ class UserDatedCounts(object):
                 
     def print_dataset(self, name="twitterdata"):
         f = open(name + '.csv', 'w')
-        f.write("tomorrow_logfrequency\ttoday_logfrequency\tyesterday_logfrequency\ttotal_population_logfrequency\tlexicon_logfrequency\tfamiliarity\tin_lexicon\tis_hashtag\tis_atreply\n")
+        f.write("tomorrow_logfrequency,today_logfrequency,yesterday_logfrequency,total_population_logfrequency,lexicon_logfrequency,familiarity,in_lexicon,is_hashtag,is_atreply\n")
         for word in self.dataset.keys():
             attrs = self.dataset[word]
             data = (repr(attrs['tomorrow_logfrequency']), \
