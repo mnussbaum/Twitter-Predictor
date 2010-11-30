@@ -172,7 +172,7 @@ class UserDatedCounts(object):
                 LF = math.log(tomorrow_words[word], 10)
                 self.dataset[word]['tomorrow_logfrequency'] = LF
             except KeyError:
-                self.dataset[word]['tomorrow_logfrequency'] = 0
+                self.dataset[word]['tomorrow_logfrequency'] = -1
             
             # log frequency of word on day i
             LF = math.log(today_words[word], 10)
