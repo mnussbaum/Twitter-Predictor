@@ -220,19 +220,18 @@ class UserDatedCounts(object):
                 
     def print_dataset(self, name="twitterdata"):
         f = open(name + '.csv', 'w')
-        f.write("tomorrow_logfrequency,today_logfrequency,yesterday_logfrequency,total_population_logfrequency,lexicon_logfrequency,familiarity,in_lexicon,is_hashtag,is_atreply\n")
         for word in self.dataset.keys():
             attrs = self.dataset[word]
             data = (repr(attrs['tomorrow_logfrequency']), \
-                    repr(attrs['today_logfrequency']), \
-                    repr(attrs['yesterday_logfrequency']), \
-                    repr(attrs['total_population_logfrequency']), \
-                    repr(attrs['lexicon_logfrequency']), \
-                    repr(attrs['familiarity']), \
-                    repr(attrs['in_lexicon']), \
-                    repr(attrs['is_hashtag']), \
-                    repr(attrs['is_atreply']))
-            f.write("%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % data)
+                    '1:' + repr(attrs['today_logfrequency']), \
+                    '2:' + repr(attrs['yesterday_logfrequency']), \
+                    '3:' + repr(attrs['total_population_logfrequency']), \
+                    '4:' + repr(attrs['lexicon_logfrequency']), \
+                    '5:' + repr(attrs['familiarity']), \
+                    '6:' + repr(attrs['in_lexicon']), \
+                    '7:' + repr(attrs['is_hashtag']), \
+                    '8:' + repr(attrs['is_atreply']))
+            f.write("%s %s %s %s %s %s %s %s %s\n" % data)
 
 
 
