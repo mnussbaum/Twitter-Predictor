@@ -157,22 +157,21 @@ class UserDatedCounts(object):
         tomorrow_words = self.words_by_date[day_i + oneday]
         yesterday_words = self.words_by_date[day_i - oneday]
         for word in today_words.keys():
-            self.dataset[word] = {'tomorrow_logfrequency':'?', \
-                                  'today_logfrequency':'?', \
-                                  'yesterday_logfrequency':'?', \
-                                  'total_population_logfrequency':'?', \
-                                  'lexicon_logfrequency':'?', \
-                                  'familiarity':'?', \
-                                  'in_lexicon':'?', \
-                                  'is_hashtag':'?', \
-                                  'is_atreply':'?'}
+            self.dataset[word] = {'tomorrow_logfrequency':-1, \
+                                  'today_logfrequency':-1, \
+                                  'yesterday_logfrequency':-1, \
+                                  'total_population_logfrequency':-1, \
+                                  'lexicon_logfrequency':-1, \
+                                  'familiarity':-1, \
+                                  'in_lexicon':-1, \
+                                  'is_hashtag':-1, \
+                                  'is_atreply':-1}
             
             # log frequency of word on day i + 1
             try:
                 LF = math.log(tomorrow_words[word], 10)
                 self.dataset[word]['tomorrow_logfrequency'] = LF
-            except KeyError:
-                self.dataset[word]['tomorrow_logfrequency'] = -1
+            except KeyError: pass
             
             # log frequency of word on day i
             LF = math.log(today_words[word], 10)
