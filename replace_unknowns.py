@@ -5,7 +5,7 @@ def replace_unknowns(text_file):
     f.close()
     index = 0
     for line in lines:
-        unknown_value = '0'
+        unknown_value = '-1'
         line = line.replace('?', unknown_value)
         lines[index] = line
         index += 1
