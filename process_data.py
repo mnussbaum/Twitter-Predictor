@@ -7,9 +7,26 @@ from populate import Population
 import datetime
 import re
 import math
+import sys
+import getopt
+
+def main():
+    opts, args = getopt.getopt(sys.argv[1:], "i:o:")
+    inpath = "lizardbill_11_20_2010"
+    outpath = "twitterdata"
+    for o, a in opts:
+        if o == '-i':
+            inpath = a
+        elif o == '-o':
+            outpath = a
+        else:
+            print o + " not a valid option!"
+    pop = Population(community_file=inpath, new=False)
+    wd = WordData(pop)
+    print "Writing dataset to file..."
+    wd.print_dataset(name=outpath)
 
 def test():
-    import populate
     pop = Population(community_file="lizardbill_11_20_2010", new=False)
     udc = WordData(pop)
     return udc
@@ -31,11 +48,10 @@ def count_words(text):
     return counts
 
 def scale(x):
-    e = 2.71828182845904523536
     if x == 0:
         return -1
     else:
-        y = e ** (-1.0 / x)
+        y = math.e ** (-1.0 / x)
         return (2 * y) - 1
 
 months = {'Jan':1, 'Feb':2, 'Mar':3,\
@@ -83,8 +99,8 @@ class WordData(object):
         self.build_lexicon()
         print "building dataset..."
         self.build_dataset()
-        print "printing dataset to csv..."
-        self.print_dataset()
+        #print "printing dataset to csv..."
+        #self.print_dataset()
         
     def get_tweets_by_user(self):
         for user in self._pop._community_members:
@@ -164,6 +180,7 @@ class WordData(object):
         yesterday_words = self.words_by_date[day_i - oneday]
         for word in today_words.keys():
             self.dataset[word] = {'tomorrow_frequency':0, \
+                                  'increase':0, \
                                   'today_frequency':0, \
                                   'yesterday_frequency':0, \
                                   'total_population_frequency':0, \
@@ -185,6 +202,12 @@ class WordData(object):
             # frequency of word on day i
             freq = today_words[word]
             self.dataset[word]['today_frequency'] = freq
+            
+            # whether frequency increases from day i to day i + 1
+            if self.dataset[word]['tomorrow_frequency'] > self.dataset[word]['today_frequency']:
+                self.dataset[word]['increase'] = 1
+            else:
+                self.dataset[word]['increase'] = 0
             
             # frequency of word on day i - 1
             try:
@@ -245,12 +268,5 @@ class WordData(object):
             f.write("%s %s %s %s %s %s %s %s %s %s %s %s\n" % data)
 
 
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    main()
