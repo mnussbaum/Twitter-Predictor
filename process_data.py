@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 
 # Extracting word information from populations!
-# Anatomy of a twittery user!
-# pt.tweets_by_user_date[15573995][datetime.date(2010, 5, 1)]
+# Print to a file readable by libSVM!
 
 from populate import Population
 import datetime
 import re
 import math
 
-def udctest():
+def test():
     import populate
     pop = Population(community_file="lizardbill_11_20_2010", new=False)
-    udc = UserDatedCounts(pop)
+    udc = WordData(pop)
     return udc
 
 def count_words(text):
@@ -31,12 +30,20 @@ def count_words(text):
             counts[word] = 1
     return counts
 
+def scale(x):
+    e = 2.71828182845904523536
+    if x == 0:
+        return -1
+    else:
+        y = e ** (-1.0 / x)
+        return (2 * y) - 1
+
 months = {'Jan':1, 'Feb':2, 'Mar':3,\
           'Apr':4, 'May':5, 'Jun':6,\
           'Jul':7, 'Aug':8, 'Sep':9,\
           'Oct':10, 'Nov':11, 'Dec':12}
 
-class UserDatedCounts(object):
+class WordData(object):
     '''Creates dictionaries of words & tweets by date by user.'''
     
     def __init__(self, source_population):
@@ -59,8 +66,7 @@ class UserDatedCounts(object):
         # transcription, length, frequency, logfrequency, familiarity
         self.lexicon = {}
         # a dictionary of word data to write to a csv file for ML!
-        # Keys are words mentioned 2 days before data collection; fields are:
-        # 
+        # Keys are words mentioned 2 days before data collection
         self.dataset = {}
         
         print "getting tweets by user..."
@@ -157,40 +163,43 @@ class UserDatedCounts(object):
         tomorrow_words = self.words_by_date[day_i + oneday]
         yesterday_words = self.words_by_date[day_i - oneday]
         for word in today_words.keys():
-            self.dataset[word] = {'tomorrow_logfrequency':-1, \
-                                  'today_logfrequency':-1, \
-                                  'yesterday_logfrequency':-1, \
-                                  'total_population_logfrequency':-1, \
-                                  'lexicon_logfrequency':-1, \
-                                  'familiarity':-1, \
-                                  'in_lexicon':-1, \
-                                  'is_hashtag':-1, \
-                                  'is_atreply':-1}
+            self.dataset[word] = {'tomorrow_frequency':0, \
+                                  'today_frequency':0, \
+                                  'yesterday_frequency':0, \
+                                  'total_population_frequency':0, \
+                                  'lexicon_frequency':0, \
+                                  'familiarity':0, \
+                                  'in_lexicon':0, \
+                                  'not_in_lexicon':0, \
+                                  'is_hashtag':0, \
+                                  'not_hashtag':0, \
+                                  'is_atreply':0, \
+                                  'not_atreply':0}
             
-            # log frequency of word on day i + 1
+            # frequency of word on day i + 1
             try:
-                LF = math.log(tomorrow_words[word], 10)
-                self.dataset[word]['tomorrow_logfrequency'] = LF
+                freq = tomorrow_words[word]
+                self.dataset[word]['tomorrow_frequency'] = freq
             except KeyError: pass
             
-            # log frequency of word on day i
-            LF = math.log(today_words[word], 10)
-            self.dataset[word]['today_logfrequency'] = LF
+            # frequency of word on day i
+            freq = today_words[word]
+            self.dataset[word]['today_frequency'] = freq
             
-            # log frequency of word on day i - 1
+            # frequency of word on day i - 1
             try:
-                LF = math.log(yesterday_words[word], 10)
-                self.dataset[word]['yesterday_logfrequency'] = LF
+                freq = yesterday_words[word]
+                self.dataset[word]['yesterday_frequency'] = freq
             except KeyError: pass
             
-            # log frequency of word in population up to day i
-            LF = math.log(self.words_upto_date[word], 10)
-            self.dataset[word]['total_population_logfrequency'] = LF
+            # frequency of word in population up to day i
+            freq = self.words_upto_date[word]
+            self.dataset[word]['total_population_frequency'] = freq
             
-            # log frequency of word in lexicon
+            # frequency of word in lexicon
             try:
-                LF = self.lexicon[word]['logfrequency']
-                self.dataset[word]['lexicon_logfrequency'] = LF
+                freq = self.lexicon[word]['frequency']
+                self.dataset[word]['lexicon_frequency'] = freq
             except KeyError: pass
             
             # familiarity of word in lexicon
@@ -198,39 +207,42 @@ class UserDatedCounts(object):
                 fam = self.lexicon[word]['familiarity']
                 self.dataset[word]['familiarity'] = fam
             except KeyError: pass
-            
-            # is the word in the lexicon? 0 if no, 1 if yes
+                
+            # is the word in the lexicon?
             if word in self.lexicon:
                 self.dataset[word]['in_lexicon'] = 1
             else:
-                self.dataset[word]['in_lexicon'] = 0
+                self.dataset[word]['not_in_lexicon'] = 1
                 
             # is the word a hashtag? 0 if no, 1 if yes
             if word[0] == '#':
                 self.dataset[word]['is_hashtag'] = 1
             else:
-                self.dataset[word]['is_hashtag'] = 0
+                self.dataset[word]['not_hashtag'] = 1
                 
             # is the word an atreply? 0 if no, 1 if yes
             if word[0] == '@':
                 self.dataset[word]['is_atreply'] = 1
             else:
-                self.dataset[word]['is_atreply'] = 0
+                self.dataset[word]['not_atreply'] = 1
                 
     def print_dataset(self, name="twitterdata"):
         f = open(name, 'w')
         for word in self.dataset.keys():
             attrs = self.dataset[word]
-            data = (repr(attrs['tomorrow_logfrequency']), \
-                    '1:' + str(attrs['today_logfrequency']), \
-                    '2:' + str(attrs['yesterday_logfrequency']), \
-                    '3:' + str(attrs['total_population_logfrequency']), \
-                    '4:' + str(attrs['lexicon_logfrequency']), \
-                    '5:' + str(attrs['familiarity']), \
+            data = (str(scale(attrs['tomorrow_frequency'])), \
+                    '1:' + str(scale(attrs['today_frequency'])), \
+                    '2:' + str(scale(attrs['yesterday_frequency'])), \
+                    '3:' + str(scale(attrs['total_population_frequency'])), \
+                    '4:' + str(scale(attrs['lexicon_frequency'])), \
+                    '5:' + str(attrs['familiarity'] / 7.0), \
                     '6:' + str(attrs['in_lexicon']), \
-                    '7:' + str(attrs['is_hashtag']), \
-                    '8:' + str(attrs['is_atreply']))
-            f.write("%s %s %s %s %s %s %s %s %s\n" % data)
+                    '7:' + str(attrs['not_in_lexicon']), \
+                    '8:' + str(attrs['is_hashtag']), \
+                    '9:' + str(attrs['not_hashtag']), \
+                    '10:' + str(attrs['is_atreply']), \
+                    '11:' + str(attrs['not_hashtag']))
+            f.write("%s %s %s %s %s %s %s %s %s %s %s %s\n" % data)
 
 
 
