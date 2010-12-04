@@ -23,13 +23,10 @@ def main():
             print o + " not a valid option!"
     pop = Population(community_file=inpath, new=False)
     wd = WordData(pop)
-    print "Writing dataset to file..."
+    print "Writing regression dataset to file..."
     wd.print_dataset(name=outpath)
-
-def test():
-    pop = Population(community_file="lizardbill_11_20_2010", new=False)
-    udc = WordData(pop)
-    return udc
+    print "Writing classification dataset to file..."
+    wd.print_class_dataset(name=outpath)
 
 def count_words(text):
     '''Takes a string. Returns a dictionary whose keys are words that appear
@@ -250,7 +247,7 @@ class WordData(object):
                 self.dataset[word]['not_atreply'] = 1
                 
     def print_dataset(self, name="twitterdata"):
-        f = open(name, 'w')
+        f = open(name + "_r", 'w')
         for word in self.dataset.keys():
             attrs = self.dataset[word]
             data = (str(scale(attrs['tomorrow_frequency'])), \
@@ -266,7 +263,26 @@ class WordData(object):
                     '10:' + str(attrs['is_atreply']), \
                     '11:' + str(attrs['not_hashtag']))
             f.write("%s %s %s %s %s %s %s %s %s %s %s %s\n" % data)
-
+        f.close()
+            
+    def print_class_dataset(self, name="twitterdata"):
+        f = open(name + "_c", 'w')
+        for word in self.dataset.keys():
+            attrs = self.dataset[word]
+            data = (str(attrs['increase']), \
+                    '1:' + str(scale(attrs['today_frequency'])), \
+                    '2:' + str(scale(attrs['yesterday_frequency'])), \
+                    '3:' + str(scale(attrs['total_population_frequency'])), \
+                    '4:' + str(scale(attrs['lexicon_frequency'])), \
+                    '5:' + str(attrs['familiarity'] / 7.0), \
+                    '6:' + str(attrs['in_lexicon']), \
+                    '7:' + str(attrs['not_in_lexicon']), \
+                    '8:' + str(attrs['is_hashtag']), \
+                    '9:' + str(attrs['not_hashtag']), \
+                    '10:' + str(attrs['is_atreply']), \
+                    '11:' + str(attrs['not_hashtag']))
+            f.write("%s %s %s %s %s %s %s %s %s %s %s %s\n" % data)
+        f.close()
 
 if __name__ == "__main__":
     main()
