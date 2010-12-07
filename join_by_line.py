@@ -2,13 +2,16 @@
 
 # Takes two files, f1 and f2. For each line index i, prints f1[i] \t f2[i]
 # Stops when the shorter file runs out of lines.
+# Use -h flag to ignore first line headers.
+# Use -s flag to unscale SVM output back to real frequencies.
 
 import sys
 import getopt
+import math
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "f:g:o:h")
+        opts, args = getopt.getopt(sys.argv[1:], "f:g:o:hs")
     except getopt.GetoptError:
         print "Invalid options. Valid options are -f FILE1 -f FILE2 -o OUTPATh -h"
         sys.exit(1)
@@ -16,6 +19,7 @@ def main():
     in2 = None
     outpath = None
     head = False
+    scale = False
     for o, a in opts:
         if o == '-f':
             in1 = a
@@ -25,6 +29,8 @@ def main():
             outpath = a
         if o == '-h':
             head = True
+        if o == '-s':
+            scale = True
     f1 = open(in1, 'r')
     f2 = open(in2, 'r')
     lines1 = f1.readlines()
@@ -39,8 +45,19 @@ def main():
     for i in range(L):
         one = lines1[i].rstrip('\n')
         two = lines2[i]
+        if scale == True:
+            two = str(unscale(eval(two)))
         output = one + '\t' + two
         outfile.write(output)
+        
+def unscale(y):
+    if y <= -1:
+        return 0
+    if y >= 1:
+        return 1000
+    else:
+        x = (y + 1) * 0.5
+        return -1.0 / math.log(x)
         
 if __name__ == "__main__":
     main()
