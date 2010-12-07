@@ -29,6 +29,9 @@ def main():
     f2 = open(in2, 'r')
     lines1 = f1.readlines()
     lines2 = f2.readlines()
+    if head == True:
+        lines1 = lines1[1:]
+        lines2 = lines2[2:]
     f1.close()
     f2.close()
     outfile = open(outpath, 'w')
