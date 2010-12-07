@@ -13,7 +13,7 @@ def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "f:g:o:hs")
     except getopt.GetoptError:
-        print "Invalid options. Valid options are -f FILE1 -f FILE2 -o OUTPATh -h"
+        print "Invalid options. Valid options are -f FILE1 -g FILE2 -o OUTPATH -h -s"
         sys.exit(1)
     in1 = None
     in2 = None
@@ -37,7 +37,7 @@ def main():
     lines2 = f2.readlines()
     if head == True:
         lines1 = lines1[1:]
-        lines2 = lines2[2:]
+        lines2 = lines2[1:]
     f1.close()
     f2.close()
     outfile = open(outpath, 'w')
@@ -46,7 +46,7 @@ def main():
         one = lines1[i].rstrip('\n')
         two = lines2[i]
         if scale == True:
-            two = str(unscale(eval(two)))
+            two = str(unscale(eval(two))) + '\n'
         output = one + '\t' + two
         outfile.write(output)
         
