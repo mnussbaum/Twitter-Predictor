@@ -16,7 +16,11 @@ import random
 import twitter_net as tn
 
 def main():
-    opts, args = getopt.getopt(sys.argv[1:], "i:o:n")
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "i:o:n")
+    except getopt.GetoptError:
+        print "Invalid options. Valid options are -i INPATH -o OUTPATH -n"
+        sys.exit(1)
     inpath = "lizardbill_11_20_2010"
     outpath = "twitterdata"
     net = False
@@ -30,12 +34,15 @@ def main():
             outpath += "_net"
         else:
             print o + " not a valid option!"
+            sys.exit(1)
     pop = Population(community_file=inpath, new=False)
     wd = WordData(pop, use_net=net)
     print "Writing regression dataset to file..."
     wd.print_dataset(name=outpath)
     print "Writing classification dataset to file..."
     wd.print_class_dataset(name=outpath)
+    print "Writing words to file..."
+    wd.print_word_freqs(name=outpath)
 
 def count_words(text):
     '''Takes a string. Returns a dictionary whose keys are words that appear
@@ -59,6 +66,15 @@ def scale(x):
     else:
         y = math.e ** (-1.0 / x)
         return (2 * y) - 1
+        
+def unscale(y):
+    if y <= -1:
+        return 0
+    if y >= 1:
+        return 1000
+    else:
+        x = (y + 1) * 0.5
+        return -1.0 / math.log(x)
 
 months = {'Jan':1, 'Feb':2, 'Mar':3,\
           'Apr':4, 'May':5, 'Jun':6,\
@@ -301,9 +317,23 @@ class WordData(object):
             else:
                 self.dataset[word]['not_atreply'] = 1
                 
+    def tf(self, word):
+        return self.dataset[word]['tomorrow_frequency']
+
+    def print_word_freqs(self, name="twitterdata"):
+        f = open(name + "_w", 'w')
+        for word in sorted(self.dataset.keys(), key=self.tf):
+            attrs = self.dataset[word]
+            data = (word.encode("ASCII", "ignore"), \
+                    str(attrs['exposure'] * 10), \
+                    str(attrs['today_frequency']), \
+                    str(attrs['tomorrow_frequency']))
+            f.write("%s\t%s\t%s\t%s\n" % data)
+        f.close()
+ 
     def print_dataset(self, name="twitterdata"):
         f = open(name + "_r", 'w')
-        for word in self.dataset.keys():
+        for word in sorted(self.dataset.keys(), key=self.tf):
             attrs = self.dataset[word]
             data = (str(scale(attrs['tomorrow_frequency'])), \
                     '1:' + str(scale(attrs['today_frequency'])), \
@@ -323,7 +353,7 @@ class WordData(object):
             
     def print_class_dataset(self, name="twitterdata"):
         f = open(name + "_c", 'w')
-        for word in self.dataset.keys():
+        for word in sorted(self.dataset.keys(), key=self.tf):
             attrs = self.dataset[word]
             data = (str(attrs['increase']), \
                     '1:' + str(scale(attrs['today_frequency'])), \
