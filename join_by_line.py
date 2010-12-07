@@ -40,4 +40,7 @@ def main():
         one = lines1[i].rstrip('\n')
         two = lines2[i]
         output = one + '\t' + two
-        outfile.write()
+        outfile.write(output)
+        
+if __name__ == "__main__":
+    main()
