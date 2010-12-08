@@ -1,6 +1,6 @@
-test_get_community does what it says, saving to the pickled_populations directory
-(pickling is saving a python object to a file). test_judge_community prints the
-friend/follower list overlaps amongst community members, allowing you to judge
-how closesly knit it is.
+Run get_community.py to gather a population of twitter users.
 
-You can download the twitter api library I'm using from http://mike.verdone.ca/twitter/
+Run process_data.py to get output files appropriate for libsvm regression.
+
+You can download the twitter api library we're using from
+http://mike.verdone.ca/twitter/.

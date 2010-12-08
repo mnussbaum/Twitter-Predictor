@@ -20,6 +20,7 @@ def main():
         opts, args = getopt.getopt(sys.argv[1:], "i:o:n")
     except getopt.GetoptError:
         print "Invalid options. Valid options are -i INPATH -o OUTPATH -n"
+        print "-n indicates that network analysis should be performed"
         sys.exit(1)
     inpath = "lizardbill_11_20_2010"
     outpath = "twitterdata"
