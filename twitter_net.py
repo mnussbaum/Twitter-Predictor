@@ -7,7 +7,7 @@ import sys
 class CommunityNet(object):
     '''A matrix of connections within a community of twitter users,
     and associated statistics.'''
-    
+
     def __init__(self, source_pop, max_n=10, verbose=False, rho=.01):
         self.pop = source_pop._community_members
         self.max_n = max_n
@@ -23,16 +23,16 @@ class CommunityNet(object):
         self.power_matrices = []
         # the summed power matrices, each multiplied by rho ^ i
         self.rho_matrix = {}
-        
+
         self.build_follower_dict()
         self.build_follower_matrix()
         self.build_power_matrices()
         self.build_rho_matrix()
-        
+
     def build_follower_dict(self):
         for member in self.pop:
             self.follower_dict[member['uid']] = member['follower_ids']
-        
+
     def build_follower_matrix(self):
         '''matrix[i][j] is 1 if user j follows user i, otherwise 0.'''
         for i in self.uids:
@@ -42,7 +42,7 @@ class CommunityNet(object):
                     self.follower_matrix[i][j] = 1
                 else:
                     self.follower_matrix[i][j] = 0
-                    
+
     def matrix_product(self, left, right):
         '''multiplies square matrices of the same size represented as
         dictionaries of dictionaries, keys being the entries in self.uids'''
@@ -55,7 +55,7 @@ class CommunityNet(object):
                     accum += left[i][k] * right[k][j]
                 new[i][j] = accum
         return new
-    
+
     def vm_product(self, v, m):
         '''multiplies a vector represented as a dictionary by a matrix
         represented as a dictionary of dictionaries to produce another vector;
@@ -69,7 +69,7 @@ class CommunityNet(object):
                 exposure += weight * posts
             exposures[follower] = exposure
         return exposures
-            
+
     def build_power_matrices(self):
         if self.verbose == True:
             sys.stdout.write("building power matrices...")
@@ -83,7 +83,7 @@ class CommunityNet(object):
             prev = self.matrix_product(prev, self.follower_matrix)
         if self.verbose == True:
             print ""
-            
+
     def build_rho_matrix(self):
         if self.verbose == True:
             sys.stdout.write("building rho matrix...")

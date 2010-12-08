@@ -6,7 +6,7 @@ def write_output(data, out_file):
     pickle.dump(data, f)
     f.close()
     print 'written'
-    
+
 
 def read_output(out_file):
     print out_file
@@ -18,7 +18,7 @@ def read_output(out_file):
         print 'IO ERROR'
         return
     return existing_records
-    
+
 def parse_twitter_timestamp(twitter_timestamp):
     split_timestamp = twitter_timestamp.split()
     month_dict = {"Jan":1, "Feb":2, "Mar":3, "Apr":4, "May":5, \

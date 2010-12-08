@@ -13,7 +13,8 @@ def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "f:g:o:hs")
     except getopt.GetoptError:
-        print "Invalid options. Valid options are -f FILE1 -g FILE2 -o OUTPATH -h -s"
+        print "Invalid options. Valid options are -f FILE1" + \
+          "-g FILE2 -o OUTPATH -h -s"
         sys.exit(1)
     in1 = None
     in2 = None
@@ -49,7 +50,7 @@ def main():
             two = str(unscale(eval(two))) + '\n'
         output = one + '\t' + two
         outfile.write(output)
-        
+
 def unscale(y):
     if y <= -1:
         return 0
@@ -58,6 +59,6 @@ def unscale(y):
     else:
         x = (y + 1) * 0.5
         return -1.0 / math.log(x)
-        
+
 if __name__ == "__main__":
     main()

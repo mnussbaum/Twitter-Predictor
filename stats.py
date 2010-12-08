@@ -22,15 +22,18 @@ class PopulationStats(object):
         for list_member in all_list_members:
             copied_list_members = deepcopy(all_list_members[:])
             copied_list_members.remove(list_member)
-            if list_member in copied_list_members and list_member not in duplicates:
+            if list_member in copied_list_members and \
+              list_member not in duplicates:
                 duplicates.append(list_member)
         assigned_duplicates = {}
         for duplicate in duplicates:
             for user in self._population:
                 if duplicate in user[list_name]:
                     if user['uid'] in assigned_duplicates:
-                        if duplicate not in assigned_duplicates[user['uid']]:
-                            assigned_duplicates[user['uid']].append(duplicate)
+                        if duplicate not in \
+                          assigned_duplicates[user['uid']]:
+                            assigned_duplicates[user['uid']].append(\
+                              duplicate)
                     else:
                         assigned_duplicates[user['uid']] = [duplicate]
         return len(duplicates), assigned_duplicates
@@ -45,14 +48,14 @@ class PopulationStats(object):
         counter = WordCounter(all_text)
         word_data = counter.get_word_data()
         return word_data
-        
+
     def all_user_ids(self):
         '''All user screen names.'''
         user_ids = []
         for user in self._population:
             user_ids.append(user['uid'])
         return user_ids
-    
+
     def all_user_names(self):
         '''All user screen names.'''
         user_names = []

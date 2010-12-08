@@ -17,9 +17,9 @@ class Population(object):
     def __init__(self, root_user_id="", max_population=24, \
       max_friends_per_user=5, community_file="", new=True, safe=False):
         '''Either load a prexisting community to add to or start a new one.
-        If not starting a new community then root_user_id doesn't do anything.
-        Community is loaded/saved to community_file.'''
-        logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG, 
+        If not starting a new community then root_user_id doesn't do
+        anything. Community is loaded/saved to community_file.'''
+        logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG,
           format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
           datefmt='%m-%d %H:%M')
         self._new = new
@@ -33,9 +33,9 @@ class Population(object):
             self._node_pool = {}
             self._community_members = []
             self._community = {
-                'root_user_id':root_user_id, 
+                'root_user_id':root_user_id,
                 'node_pool':{},
-                'members':[], 
+                'members':[],
             }
         #add to existing community
         elif not new:
@@ -43,7 +43,7 @@ class Population(object):
             self._root_user_id = self._community['root_user_id']
             self._node_pool = self._community['node_pool']
             self._community_members = self._community['members']
-            
+
     def populate(self):
         if self._new:
             self._initial_populate()
@@ -52,24 +52,29 @@ class Population(object):
 
     def _initial_populate(self):
         '''Gather a group of TwitterUsers. Tries to choose a highly
-        interconnected group.''' 
+        interconnected group.'''
         root_user = TwitterUser(self._root_user_id)
         root_node = root_user.get_all_data()
         self._community_members.append(root_node)
         root_score = self._filled_user_score(root_node)
         #user scores determine how interconnected a user is
-        self._node_pool[self._root_user_id] = {'user':root_node, 'score':root_score}
+        self._node_pool[self._root_user_id] = {'user':root_node,
+          'score':root_score}
         logging.debug('Adding root to node_pool')
         self.save()
         self._resume_populate()
-            
+
     def _resume_populate(self):
         '''Gather a group of TwitterUsers. Tries to choose a highly
         interconnected group. Picks up where a previous _populate()
-        call stopped''' 
-        while self._node_pool and len(self._community_members) < self._max_population:
-            #choose person on list with highest interconnection
-            #first 0 at end of line is to take first user, second 0 get's user's id from tuple result
+        call stopped'''
+        while self._node_pool and len(self._community_members) < \
+          self._max_population:
+            '''
+            choose person on list with highest interconnection
+            first 0 at end of line is to take first user, second
+            0 get's user's id from tuple result
+            '''
             self._rescore_node_pool()
             highest_scoring_id = sorted(self._node_pool.items(), key=lambda item: item[1]['score'], reverse=True)[0][0]
             curr_node = self._node_pool[highest_scoring_id]['user']
@@ -125,7 +130,7 @@ class Population(object):
                     except URLError:
                         delete_highest_scoring_id = False
                         logging.debug('URLError, sleeping for 5 secs')
-                        sleep(5)                    
+                        sleep(5)
             #once a user is chosen for evaluation pop him off the node list
             del self._node_pool[highest_scoring_id]
             if self._safe:
@@ -137,7 +142,7 @@ class Population(object):
 
     def get_community(self):
         return self._community
-        
+
     def _rescore_node_pool(self):
         for node_id in self._node_pool:
             curr_node = self._node_pool[node_id]
@@ -161,7 +166,7 @@ class Population(object):
                 follower_percent_overlap = follower_overlap/user['follower_count']
             except ZeroDivisionError:
                 follower_percent_overlap = 0
-            
+
             reply_score = 0
             user_stats = UserStats(user, self._community_members)
             replies = user_stats.replies()
@@ -202,7 +207,7 @@ class Population(object):
     def _intersection(self, first_list, second_list):
         intersection = set(first_list).intersection(set(second_list))
         return intersection
-        
+
     def save(self):
         self._community['node_pool'] = self._node_pool
         self._community['members'] = self._community_members

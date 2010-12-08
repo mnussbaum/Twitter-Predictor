@@ -16,18 +16,12 @@ class TwitterUser(object):
     def __init__(self, uid):
         '''Twitter OAuth tokens and secrets, necessary for
         logging in to get higher rate-limit.'''
-        con_secret = 'D0yCV2JwUzRstWNvTqDBynT8UbqFSSy7k38MlRHzUK4'
-        con_secret_key = 'fQefIH0xSzeV0q2LqHUsZQ'
-        token = '216605248-QRmiLAmNIKGEQWsNUSJ6MQGDMq6nhiyZqYJo4zTH'
-        token_key = 'dDyY7M4uGrnJ8K7EzTGyuFhazjtW2zEqQlSAOVHmqE'
-        self._uid = uid      
+        self._uid = uid
         self._twit = twitter.Twitter()
-        #self._twit = twitter.Twitter(auth=OAuth(token, token_key, \
-        #  con_secret, con_secret_key))
 
     def _get_follower_ids(self):
         follower_ids = self._twit.followers.ids(user_id=\
-          self._uid)        
+          self._uid)
         return follower_ids
 
     def _get_friend_ids(self):
@@ -41,9 +35,10 @@ class TwitterUser(object):
         raw_tweets = self._twit.statuses.user_timeline(user_id=\
           self._uid, count=200)
         trimmed_tweets = []
-        desired_fields = ['created_at', 'favorited', 'geo', 'coordinates', \
-          'id', 'in_reply_to_screen_name', 'in_reply_to_status_id', \
-          'place', 'retweet_count', 'retweeted', 'text','truncated', 'user']
+        desired_fields = ['created_at', 'favorited', 'geo', 'coordinates',
+          'id', 'in_reply_to_screen_name', 'in_reply_to_status_id',
+          'place', 'retweet_count', 'retweeted', 'text','truncated',
+          'user']
         for tweet in raw_tweets:
             new_tweet = {}
             for field in tweet:
@@ -51,7 +46,7 @@ class TwitterUser(object):
                     new_tweet[field] = tweet[field]
             trimmed_tweets.append(new_tweet)
         return trimmed_tweets
-        
+
     def _user_data_from_tweets(self, tweets):
         if tweets:
             most_recent_tweet = tweets[0]
@@ -63,7 +58,7 @@ class TwitterUser(object):
             follower_count = 0
             screen_name = ""
         return friend_count, follower_count, screen_name
-        
+
     def _active_tweeter(self, tweets):
         tweeted_today = False
         tweeted_yesterday = False
@@ -74,7 +69,8 @@ class TwitterUser(object):
             time_diff = now - formatted_timestamp
             if time_diff <= timedelta(days=1):
                 tweeted_today = True
-            if time_diff <= timedelta(days=2) and time_diff > timedelta(days=1):
+            if time_diff <= timedelta(days=2) and\
+              time_diff > timedelta(days=1):
                 tweeted_yesterday = True
         return tweeted_today and tweeted_yesterday
 
@@ -82,7 +78,8 @@ class TwitterUser(object):
         '''Runs all data gathering methods, returns results.'''
         self._timestamp = datetime.now()
         tweets = self._get_tweets()
-        friend_count, follower_count, screen_name = self._user_data_from_tweets(tweets)
+        friend_count, follower_count, screen_name = \
+          self._user_data_from_tweets(tweets)
         if friend_count > 5000 or follower_count > 5000:
            raise BadUser('too many friends/followers')
         if not self._active_tweeter(tweets):
@@ -90,9 +87,10 @@ class TwitterUser(object):
         sleep(1)
         follower_ids = self._get_follower_ids()
         sleep(1)
-        friend_ids = self._get_friend_ids()        
+        friend_ids = self._get_friend_ids()
         sleep(1)
-        result = {'tweets':tweets, 'friend_ids':friend_ids, 'follower_ids':follower_ids, \
-          'uid':self._uid, 'timestamp':self._timestamp, 'friend_count':friend_count, \
+        result = {'tweets':tweets, 'friend_ids':friend_ids,
+          'follower_ids':follower_ids, 'uid':self._uid,
+          'timestamp':self._timestamp, 'friend_count':friend_count,
           'follower_count':follower_count, 'screen_name':screen_name}
         return result

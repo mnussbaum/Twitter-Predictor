@@ -8,7 +8,7 @@ def main(file_path):
     for line in lines:
         split_line = line.split()
         if float(split_line[-1]) < 1000:
-            lines_within_bounds.append(line)        
+            lines_within_bounds.append(line)
     #take ever 100th line
     desired_output = []
     line_counter = 0

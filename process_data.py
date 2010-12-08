@@ -67,7 +67,7 @@ def scale(x):
     else:
         y = math.e ** (-1.0 / x)
         return (2 * y) - 1
-        
+
 def unscale(y):
     if y <= -1:
         return 0
@@ -84,7 +84,7 @@ months = {'Jan':1, 'Feb':2, 'Mar':3,\
 
 class WordData(object):
     '''Creates dictionaries of words & tweets by date by user.'''
-    
+
     def __init__(self, source_population, use_net=False):
         self._pop = source_population
         # udc.tweets_by_user[uid] -> all of a user's tweets
@@ -116,7 +116,7 @@ class WordData(object):
         # a dictionary of word data to write to a csv file for ML!
         # Keys are words mentioned 2 days before data collection
         self.dataset = {}
-        
+
         print "getting tweets by user..."
         self.get_tweets_by_user()
         print "gettings tweets by user and date..."
@@ -136,12 +136,13 @@ class WordData(object):
             self.get_exposures()
         print "building dataset..."
         self.build_dataset()
-        
+
     def get_tweets_by_user(self):
         for user in self._pop._community_members:
-            dated_tweets = [(x['created_at'], x['text']) for x in user['tweets']]
+            dated_tweets = [(x['created_at'], x['text']) for x \
+              in user['tweets']]
             self.tweets_by_user[user['uid']] = dated_tweets
-    
+
     def get_tweets_by_user_date(self):
         for uid in [x['uid'] for x in self._pop._community_members]:
             self.tweets_by_user_date[uid] = {}
@@ -156,14 +157,14 @@ class WordData(object):
                     self.tweets_by_user_date[uid][date] += [text]
                 except:
                     self.tweets_by_user_date[uid][date] = [text]
-                    
+
     def get_words_by_user_date(self):
         for uid in [x['uid'] for x in self._pop._community_members]:
             self.words_by_user_date[uid] = {}
             for date in self.tweets_by_user_date[uid].keys():
                 tweets = "\n".join(self.tweets_by_user_date[uid][date])
                 self.words_by_user_date[uid][date] = count_words(tweets)
-                
+
     def get_words_by_date(self):
         for user in self.words_by_user_date.keys():
             for date in self.words_by_user_date[user].keys():
@@ -175,7 +176,7 @@ class WordData(object):
                         self.words_by_date[date][word] += count
                     else:
                         self.words_by_date[date][word] = count
-                        
+
     def get_words_upto_date(self, day=None):
         # day defaults to 2 days before collection
         if day == None:
@@ -189,7 +190,7 @@ class WordData(object):
                     self.words_upto_date[word] += count
                 else:
                     self.words_upto_date[word] = count
-                    
+
     def build_lexicon(self, inpath="hoosier.txt"):
         # Creates a dictionary from hoosier corpus.
         # orthography = 0, transcription=1, length = 2
@@ -203,7 +204,7 @@ class WordData(object):
                                      'frequency':eval(line[3]), \
                                      'logfrequency':eval(line[4]), \
                                      'familiarity':eval(line[5])}
-            
+
     def net_frequency(self, word, day):
         '''Given a word and a day, first makes a dictionary of how many times each
         user in the population mentioned that word on that day. Multiplies that
@@ -219,7 +220,7 @@ class WordData(object):
         exposures = self.net.vm_product(freqs, self.net.rho_matrix)
         ex_list = [exposures[uid] for uid in exposures.keys()]
         return sum(ex_list) / 10.0
-        
+
     def get_exposures(self, day=None):
         # day defaults to 2 days before collection
         if day == None:
@@ -228,7 +229,7 @@ class WordData(object):
             self.exposures[word] = self.net_frequency(word, day)
             if random.randint(0, 100) == 0:
                 print '\t', self.exposures[word], '\t', word
-            
+
     def build_dataset(self, day_i=None):
         if day_i == None:
             day_i = sorted(self.words_by_date.keys())[-3]
@@ -253,39 +254,40 @@ class WordData(object):
                                   'not_hashtag':0, \
                                   'is_atreply':0, \
                                   'not_atreply':0}
-            
+
             # frequency of word on day i + 1
             try:
                 freq = tomorrow_words[word]
                 self.dataset[word]['tomorrow_frequency'] = freq
             except KeyError: pass
-            
+
             # frequency of word on day i
             freq = today_words[word]
             self.dataset[word]['today_frequency'] = freq
-            
+
             # whether frequency increases from day i to day i + 1
-            if self.dataset[word]['tomorrow_frequency'] > self.dataset[word]['today_frequency']:
+            if self.dataset[word]['tomorrow_frequency'] > \
+              self.dataset[word]['today_frequency']:
                 self.dataset[word]['increase'] = 1
             else:
                 self.dataset[word]['increase'] = 0
-            
+
             # frequency of word on day i - 1
             try:
                 freq = yesterday_words[word]
                 self.dataset[word]['yesterday_frequency'] = freq
             except KeyError: pass
-            
+
             # frequency of word in population up to day i
             freq = self.words_upto_date[word]
             self.dataset[word]['total_population_frequency'] = freq
-            
+
             # frequency of word in lexicon
             try:
                 freq = self.lexicon[word]['frequency']
                 self.dataset[word]['lexicon_frequency'] = freq
             except KeyError: pass
-            
+
             # predicted exposure.
             # only runs if use_net is true; else leaves everything 0s
             if self.use_net == True:
@@ -293,31 +295,31 @@ class WordData(object):
                     ex = self.exposures[word]
                     self.dataset[word]['exposure'] = ex
                 except KeyError: pass
-            
+
             # familiarity of word in lexicon
             try:
                 fam = self.lexicon[word]['familiarity']
                 self.dataset[word]['familiarity'] = fam
             except KeyError: pass
-                
+
             # is the word in the lexicon?
             if word in self.lexicon:
                 self.dataset[word]['in_lexicon'] = 1
             else:
                 self.dataset[word]['not_in_lexicon'] = 1
-                
+
             # is the word a hashtag? 0 if no, 1 if yes
             if word[0] == '#':
                 self.dataset[word]['is_hashtag'] = 1
             else:
                 self.dataset[word]['not_hashtag'] = 1
-                
+
             # is the word an atreply? 0 if no, 1 if yes
             if word[0] == '@':
                 self.dataset[word]['is_atreply'] = 1
             else:
                 self.dataset[word]['not_atreply'] = 1
-                
+
     def tf(self, word):
         return self.dataset[word]['tomorrow_frequency']
 
@@ -331,7 +333,7 @@ class WordData(object):
                     str(attrs['tomorrow_frequency']))
             f.write("%s\t%s\t%s\t%s\n" % data)
         f.close()
- 
+
     def print_dataset(self, name="twitterdata"):
         f = open(name + "_r", 'w')
         for word in sorted(self.dataset.keys(), key=self.tf):
@@ -339,7 +341,7 @@ class WordData(object):
             data = (str(scale(attrs['tomorrow_frequency'])), \
                     '1:' + str(scale(attrs['today_frequency'])), \
                     '2:' + str(scale(attrs['yesterday_frequency'])), \
-                    '3:' + str(scale(attrs['total_population_frequency'])), \
+                    '3:' + str(scale(attrs['total_population_frequency'])),
                     '4:' + str(scale(attrs['lexicon_frequency'])), \
                     '5:' + str(scale(attrs['exposure'])), \
                     '6:' + str(attrs['familiarity'] / 7.0), \
@@ -351,7 +353,7 @@ class WordData(object):
                     '12:' + str(attrs['not_hashtag']))
             f.write("%s %s %s %s %s %s %s %s %s %s %s %s %s\n" % data)
         f.close()
-            
+
     def print_class_dataset(self, name="twitterdata"):
         f = open(name + "_c", 'w')
         for word in sorted(self.dataset.keys(), key=self.tf):
@@ -359,7 +361,7 @@ class WordData(object):
             data = (str(attrs['increase']), \
                     '1:' + str(scale(attrs['today_frequency'])), \
                     '2:' + str(scale(attrs['yesterday_frequency'])), \
-                    '3:' + str(scale(attrs['total_population_frequency'])), \
+                    '3:' + str(scale(attrs['total_population_frequency'])),
                     '4:' + str(scale(attrs['lexicon_frequency'])), \
                     '5:' + str(scale(attrs['exposure'])), \
                     '6:' + str(attrs['familiarity'] / 7.0), \
